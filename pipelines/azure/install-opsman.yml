@@ -1,4 +1,29 @@
 ---
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Reusable anchors                                                  │
+#│                                                                   │
+#├ credhub-interpolate:                                              │
+#│ └── Params required to run credhub interpolation                  │
+#├ storage-params                                                    │
+#│ └── Common Azure blob storage details                             │
+#└───────────────────────────────────────────────────────────────────┘
+credhub-interpolate: &credhub-interpolate
+  image: platform-automation-image
+  file: platform-automation-tasks/tasks/credhub-interpolate.yml
+  input_mapping:
+    files: configuration
+  params:
+    CREDHUB_SERVER: ((credhub.server))
+    CREDHUB_CA_CERT: ((credhub.ca_cert))
+    CREDHUB_CLIENT: ((credhub.client))
+    CREDHUB_SECRET: ((credhub.secret))
+    PREFIX: /concourse/((foundation))
+    INTERPOLATION_PATH: ((credhub.interpolate_folders))
+
+storage-params: &storage-params
+  storage_account_name: ((azure_blob.username))
+  storage_account_key: ((azure_blob.password))
+  container: ((azure_blob.container))
 
 resource_types:
 # A custom Concourse Resource type for detecting Semver-based config
@@ -12,26 +37,20 @@ resources:
 - name: platform-automation-tasks
   type: azure-blobstore
   source:
-    storage_account_name: {{storage_account_name}}
-    storage_account_key: {{storage_account_key}}
-    container: {{container}}
     regexp: .*tasks-(.*).zip
+    <<: *storage-params
 
 - name: platform-automation-image
   type: azure-blobstore
   source:
-    storage_account_name: {{storage_account_name}}
-    storage_account_key: {{storage_account_key}}
-    container: {{container}}
     regexp: .*image-(.*).tgz
+    <<: *storage-params
 
 - name: installation
   type: azure-blobstore
   source:
-    storage_account_name: {{storage_account_name}}
-    storage_account_key: {{storage_account_key}}
-    container: {{container}}
     regexp: installation-after-(.*).zip
+    <<: *storage-params
 
 - name: product-config-opsman
   type: semver-config
@@ -39,7 +58,7 @@ resources:
     driver: git
     uri: ((git.configuration.uri))
     branch: master
-    private_key: ((git.private_key))
+    private_key: ((git_user.private_key))
     config_file: ((foundation))/products.yml
     config_path: products.opsman
     version_path: products.opsman.product-version
@@ -48,23 +67,9 @@ resources:
 - name: configuration
   type: git
   source:
-    private_key: ((git.private_key))
+    private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
     branch: master
-
-# reusable stuff
-credhub-interpolate: &credhub-interpolate
-  image: platform-automation-image
-  file: platform-automation-tasks/tasks/credhub-interpolate.yml
-  input_mapping:
-    files: configuration
-  params:
-    CREDHUB_SERVER: ((credhub.server))
-    CREDHUB_CA_CERT: ((credhub.ca_cert))
-    CREDHUB_CLIENT: ((credhub.client))
-    CREDHUB_SECRET: ((credhub.secret))
-    PREFIX: /concourse/((foundation))
-    INTERPOLATION_PATH: ((credhub.interpolate_folders))
 
 jobs:
 # 1. create-opsman-and-configure-auth

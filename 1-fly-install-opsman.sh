@@ -24,5 +24,5 @@ if [[ ${#ops_files[@]} > 0 ]]; then
 fi
 
 fly -t $concourse_target set-pipeline -p $pipeline_name \
-    -c <( cat pipelines/install-opsman.yml | $config_file ) \
-    -l vars-${platform_code}/vars-common.yml
+    -c <( cat pipelines/azure/install-opsman.yml | $config_file ) \
+    -l vars-${platform_code}/vars-azure-common.yml
