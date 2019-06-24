@@ -1,5 +1,5 @@
 #! /bin/bash
-
+set -x
 concourse_target="$1" && shift
 platform_code="$1" && shift
 pipeline_name="$1" && shift
