@@ -1,0 +1,37 @@
+bosh_deployed_vms_security_group_name = control-bosh-deployed-vms-security-group
+bosh_root_storage_account = optaybjj6zra72u47xb9
+client_id = <sensitive>
+client_secret = <sensitive>
+control_plane_db_password = <sensitive>
+control_plane_db_username = 
+control_plane_domain = *.control.pcfplatform.net
+control_plane_fqdn = 
+control_plane_lb_name = control-lb
+control_plane_security_group = control-control-plane-security-group
+control_plane_subnet_cidr = 10.0.10.0/28
+control_plane_subnet_gateway = 10.0.10.1
+control_plane_subnet_name = control-control-plane-subnet
+env_dns_zone_name_servers = [
+  "ns1-02.azuregov-dns.us",
+  "ns2-02.azuregov-dns.us",
+  "ns3-02.azuregov-dns.us",
+  "ns4-02.azuregov-dns.us",
+]
+iaas = azure
+infrastructure_subnet_cidr = 10.0.8.0/26
+infrastructure_subnet_gateway = 10.0.8.1
+infrastructure_subnet_name = control-infrastructure-subnet
+network_name = control-virtual-network
+ops_manager_dns = opsman.control.pcfplatform.net
+ops_manager_ip = 52.227.180.241
+ops_manager_private_ip = 10.0.8.4
+ops_manager_public_ip = 52.227.180.241
+ops_manager_security_group_name = control-ops-manager-security-group
+ops_manager_ssh_private_key = <sensitive>
+ops_manager_ssh_public_key = <sensitive>
+ops_manager_storage_account = 1r4l61sn2tgruj7huh92
+optional_ops_manager_dns = .
+optional_ops_manager_public_ip = 
+pcf_resource_group_name = control
+subscription_id = <sensitive>
+tenant_id = <sensitive>
