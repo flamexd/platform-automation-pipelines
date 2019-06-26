@@ -2,3 +2,4 @@
 _*
 **/_*
 vars-dev/vars-azure-common.yml
+state/*.tfstate

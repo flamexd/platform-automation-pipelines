@@ -23,8 +23,8 @@ credhub-interpolate: &credhub-interpolate
 storage-params: &storage-params
   storage_account_name: ((azure_blob.username))
   storage_account_key: ((azure_blob.password))
-  container: ((azure_blob.container))
-  base_url: ((azure_blob.base_url))
+  container: resources
+  base_url: core.usgovcloudapi.net
 
 resource_types:
 # A custom Concourse Resource type for detecting Semver-based config
