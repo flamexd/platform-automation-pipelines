@@ -13,7 +13,7 @@ products:
     product-version: "2.6.0"
     pivnet-product-slug: ops-manager
     pivnet-api-token: ((pivnet_token))
-    pivnet-file-glob: ops-manager-azure-*.yml
+    pivnet-file-glob: "*.pivotal"
 
   # ==== Products
 
