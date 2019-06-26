@@ -2,8 +2,8 @@
 
 # basic authentication
 
-username: ((opsman_admin.username))
-password: ((opsman_admin.password))
+username: ((opsman.admin_user.username))
+password: ((opsman.admin_user.password))
 
 # decryption-passphrase is optional,
 # except for use with `import-installation`.
