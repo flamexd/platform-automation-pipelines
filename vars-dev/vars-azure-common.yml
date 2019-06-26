@@ -1,0 +1,43 @@
+---
+foundation: sbx                                       # current foundation code
+
+azure:
+  subscription_id: ((azure_subscription.value))
+  resource_group: ((azure_resource_group.value))
+  tenant_id: ((azure_tenant_id.value))
+  client_id: ((azure_client.username))
+  client_secret: ((azure_client.password))
+  location: ((azure_location.value))
+  container: opsmanagerimage                    # container for opsman image
+  network_security_group: ops-manager-security-group
+  vpc_subnet: ((azure_vpc_subnet.value)
+  public_ip: 13.72.22.230
+  private_ip: 
+
+azure_blob:
+  username: ((azure_blob.username))
+  password: ((azure_blob.password))
+  container: ((azure_blob_url.value))
+  base_url: ((azure_blob_container.value))
+
+credhub:
+  server: https://192.168.50.6:8844       # CredHub endpoint
+  ca_cert: ((credhub_ca_cert.certificate))            # CA Cert from CredHub
+  client: ((credhub_client.username))                 # UAA Client for CredHub access
+  secret: ((credhub_client.password))                 # UAA secret for CredHub access
+  interpolate_folders: "sbx/config sbx/env sbx/vars"  # The folders from configuration repo (see below git.configuration) to be interpolated
+
+git:
+  configuration:                                      # The configuration repo
+    uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/platform-automation-pipelines
+    products_file: products.yml                       # The products yaml file that used to track for version changes
+  user:                                               # The user for access to configuration repo
+    email: ((git_email.value))                  # a dummy email will work if we're using private_key for authentication
+    username: ((git.username))                   # a dummy username will work if we're using private_key for authentication
+    private_key: ((git_user.private_key))             # The private for access to configuration repo
+
+schedule:
+  patch:                                              # Patch scheduler, the whole chunk will be used as ((schedule.patch))
+    start: 12:00 AM                                   # by following Time Resource https://github.com/concourse/time-resource
+    stop: 1:00 AM
+    location: Asia/Singapore
