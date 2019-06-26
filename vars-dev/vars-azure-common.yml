@@ -36,6 +36,15 @@ git:
     username: ((git.username))                   # a dummy username will work if we're using private_key for authentication
     private_key: ((git_user.private_key))             # The private for access to configuration repo
 
+opsman:
+  target: ((opsman_target)
+  admin_user:
+    username: ((opsman_admin.username))
+    password: ((opsman_admin.password))
+
+pivotal:
+  pivnet_token: ((pivnet_token))
+
 schedule:
   patch:                                              # Patch scheduler, the whole chunk will be used as ((schedule.patch))
     start: 12:00 AM                                   # by following Time Resource https://github.com/concourse/time-resource

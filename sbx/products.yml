@@ -29,7 +29,7 @@ products:
   csb:
     product-version: "1.1.0"
     pivnet-product-slug: credhub-service-broker
-    pivnet-api-token: ((pivnet_token))
+    pivnet-api-token: ((pivotal.pivnet_token))
     pivnet-file-glob: "*.pivotal"
     stemcell-iaas: azure
 
@@ -37,6 +37,6 @@ products:
   redis:
     product-version: "2.0.1"
     pivnet-product-slug: p-redis
-    pivnet-api-token: ((pivnet_token))
+    pivnet-api-token: ((pivotal.pivnet_token))
     pivnet-file-glob: "*.pivotal"
     stemcell-iaas: azure
