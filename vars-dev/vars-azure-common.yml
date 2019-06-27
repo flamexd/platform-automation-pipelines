@@ -17,8 +17,8 @@ azure:
 azure_blob:
   username: ((azure_blob.username))
   password: ((azure_blob.password))
-  container: ((azure_blob_url))
-  base_url: ((azure_blob_container))
+  container: ((azure_blob_container))
+  base_url:  ((azure_blob_url))
 
 credhub:
   server: https://192.168.50.6:8844       # CredHub endpoint
