@@ -13,13 +13,13 @@ opsman-configuration:
     # Note that there are several environment-specific details in this path
     vpc_subnet: ((azure.vpc_subnet))
 
-    storage_account: ((azure_blob.username))                      # account name of container
+    storage_account: ((azure.storage_account))                      # account name of container
 
     # Optional
     # only needed if your client doesn't have the needed storage permissions
-    storage_key: ((azure_blob.password))
+    storage_key: ((azure.storage_key))
 
-    ssh_public_key: ((git_user.public_key))
+    ssh_public_key: ((azure.ssh_public_key))
     vm_name: ops-manager-vm                       # default: Ops Manager-vm
     boot_disk_size: 100                           # default: 200
     cloud_name: AzureUSGovernment                 # default: AzureCloud
