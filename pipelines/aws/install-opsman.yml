@@ -48,7 +48,7 @@ resources:
     private_key: ((git.private_key))
     config_file: ((foundation))/products.yml
     config_path: products.opsman
-    version_path: products.opsman.product-version
+    version_path: products.opsman.product-version-regex
     version_pattern: "m.n.p"
 
 - name: configuration
