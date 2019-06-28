@@ -11,8 +11,8 @@ azure:
   container: opsmanagerimage                    # container for opsman image
   network_security_group: ops-manager-security-group
   vpc_subnet: ((azure_vpc_subnet))
-  public_ip: 13.72.22.230
-  private_ip: 
+  # public_ip: 13.72.22.230
+  private_ip: 10.0.8.4
 
 azure_blob:
   username: ((azure_blob.username))
