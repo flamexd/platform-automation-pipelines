@@ -1,5 +1,5 @@
 ---
-foundation: sbx                                       # current foundation code
+foundation: main                                       # current foundation code
 
 azure:
   subscription_id: ((azure_subscription))
@@ -25,7 +25,7 @@ credhub:
   ca_cert: ((credhub_ca_cert.certificate))            # CA Cert from CredHub
   client: ((credhub_client.username))                 # UAA Client for CredHub access
   secret: ((credhub_client.password))                 # UAA secret for CredHub access
-  interpolate_folders: "sbx/config sbx/env sbx/vars"  # The folders from configuration repo (see below git.configuration) to be interpolated
+  interpolate_folders: "((foundation))/config ((foundation))/env ((foundation))/vars"  # The folders from configuration repo (see below git.configuration) to be interpolated
 
 git:
   configuration:                                      # The configuration repo
