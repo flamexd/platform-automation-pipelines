@@ -4,11 +4,11 @@ resource_types:
 
 #@ def resource_types():
 
-#! - name: pivnet
-#!   type: docker-image
-#!   source:
-#!     repository: pivotalcf/pivnet-resource
-#!     tag: latest-final
+! - name: pivnet
+!   type: docker-image
+!   source:
+!     repository: pivotalcf/pivnet-resource
+!     tag: latest-final
 
 - name: semver-config
   type: docker-image
