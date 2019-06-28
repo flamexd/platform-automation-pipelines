@@ -73,7 +73,7 @@ resources:
     private_key: ((git_user.private_key))
     config_file: ((foundation))/products.yml
     config_path: products.opsman
-    version_path: products.opsman.product-version-regex
+    version_path: products.opsman.product-version
     version_pattern: "m.n.p"
 
 - name: configuration
