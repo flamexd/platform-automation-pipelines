@@ -21,10 +21,10 @@ azure_blob:
   base_url:  ((azure_blob_url))
 
 credhub:
-  server: https://192.168.50.6:8844       # CredHub endpoint
-  ca_cert: ((credhub_ca_cert.certificate))            # CA Cert from CredHub
-  client: ((credhub_client.username))                 # UAA Client for CredHub access
-  secret: ((credhub_client.password))                 # UAA secret for CredHub access
+  server: https://localhost      # CredHub endpoint
+  ca_cert: ((credhub_ca_cert))            # CA Cert from CredHub
+  client: ((credhub_username))                 # UAA Client for CredHub access
+  secret: ((credhub_password))                 # UAA secret for CredHub access
   interpolate_folders: "((foundation))/config ((foundation))/env ((foundation))/vars"  # The folders from configuration repo (see below git.configuration) to be interpolated
 
 git:
