@@ -1,1 +1,2 @@
-{"iaas": "azure", "vm_id":"ops-manager-vm"}
+iaas: azure   # The right IaaS among: gcp, vsphere, aws, azure, openstack
+vm_id:      # set it as empty as initial and the pipelines will maintain its value automatically
