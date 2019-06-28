@@ -42,8 +42,8 @@ opsman:
     username: ((opsman_admin.username))
     password: ((opsman_admin.password))
 
-pivotal:
-  pivnet_token: ((pivnet_token))
+
+pivnet_token: ((pivnet_token))
 
 schedule:
   patch:                                              # Patch scheduler, the whole chunk will be used as ((schedule.patch))

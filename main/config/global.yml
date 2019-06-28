@@ -2,4 +2,4 @@
 
 # Global configs
 
-pivnet_token: ((pivotal.pivnet_token))
+pivnet_token: ((pivnet_token))
