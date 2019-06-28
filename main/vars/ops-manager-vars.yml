@@ -7,7 +7,6 @@ opsman-configuration:
 # 2. The values of the YAML elements are values stored in CredHub
 
   azure:
-
     subscription_id: ((azure_subscription))
     resource_group: ((azure_resource_group))
     tenant_id: ((azure_tenant_id))
@@ -17,6 +16,11 @@ opsman-configuration:
     container: opsmanagerimage                    # container for opsman image
     network_security_group: ops-manager-security-group
     vpc_subnet: ((azure_vpc_subnet))
+
+    # At least one IP address (public or private)
+    # needs to be assigned to the VM.
+    # It is also permissable to assign both.
+
     public_ip: 13.72.22.230
     private_ip: 
 
@@ -37,9 +41,3 @@ opsman-configuration:
     # set to true if you want to create the new opsman vm with unmanaged disk
     # delete-vm discovers the disk type from the VM
     use_unmanaged_disk: false
-
-    # At least one IP address (public or private)
-    # needs to be assigned to the VM.
-    # It is also permissable to assign both.
-    # public_ip: ((azure.public_ip))
-    # private_ip: ((azure.private_ip))

@@ -33,7 +33,7 @@ git:
     products_file: products.yml                       # The products yaml file that used to track for version changes
   user:                                               # The user for access to configuration repo
     email: ((git_email))                  # a dummy email will work if we're using private_key for authentication
-    username: ((git.username))                   # a dummy username will work if we're using private_key for authentication
+    username: ((git_username))                   # a dummy username will work if we're using private_key for authentication
     private_key: ((git_user.private_key))             # The private for access to configuration repo
 
 opsman:
