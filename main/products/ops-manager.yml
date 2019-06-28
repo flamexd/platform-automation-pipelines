@@ -7,7 +7,7 @@ opsman-configuration:
     client_id: ((azure.client_id))
     client_secret: ((azure.client_secret))
     location: ((azure.location))
-    container: opsmanagerimage                    # container for opsman image
+    container: ((azure.container))                    # container for opsman image
     network_security_group: ops-manager-security-group
 
     # Note that there are several environment-specific details in this path

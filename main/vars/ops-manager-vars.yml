@@ -12,7 +12,7 @@
     client_id: ((azure_client.username))
     client_secret: ((azure_client.password))
     location: ((azure_location))
-    container: opsmanagerimage                    # container for opsman image
+    container: ((azure_container))                    # container for opsman image
     network_security_group: ops-manager-security-group
     vpc_subnet: ((azure_vpc_subnet))
 
