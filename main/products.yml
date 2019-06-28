@@ -10,10 +10,10 @@ products:
 
   # ==== Ops Manager
   opsman:
-    product-version: ^2\.6\..*$
+    product-version-regex: ^2\.6\..*$
     pivnet-product-slug: ops-manager
     pivnet-api-token: ((pivnet_token))
-    pivnet-file-glob: "ops-manager-azure-*-build.*.yml"
+    pivnet-file-glob: "*.pivotal"
 
   # ==== Products
 
