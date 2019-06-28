@@ -12,7 +12,7 @@
     client_id: ((azure_client.username))
     client_secret: ((azure_client.password))
     location: ((azure_location))
-    container: ((azure_container))                    # container for opsman image
+    container: ((azure_opsman_container))                    # container for opsman image
     network_security_group: ops-manager-security-group
     vpc_subnet: ((azure_vpc_subnet))
 
@@ -25,11 +25,11 @@
 
     # Note that there are several environment-specific details in this path
 
-    storage_account: ((azure_blob.username))                      # account name of container
+    storage_account: ((azure_opsman_blob.username))                      # account name of container
 
     # Optional
     # only needed if your client doesn't have the needed storage permissions
-    storage_key: ((azure_blob.password))
+    storage_key: ((azure_opsman_blob.password))
 
     ssh_public_key: ((git_user.public_key))
     vm_name: ops-manager-vm                       # default: Ops Manager-vm
