@@ -5,6 +5,22 @@ az-configuration:
   iaas_configuration_guid: 18ee20e8115803415d11
 - name: zone-3
   iaas_configuration_guid: 18ee20e8115803415d11
+# iaas-configurations:
+# - additional_cloud_properties: {}
+#   availability_mode: ((iaas-configurations_0_availability_mode))
+#   bosh_storage_account_name: ((iaas-configurations_0_bosh_storage_account_name))
+#   client_id: ((iaas-configurations_0_client_id))
+#   cloud_storage_type: ((iaas-configurations_0_cloud_storage_type))
+#   default_security_group: ((iaas-configurations_0_default_security_group))
+#   deployed_cloud_storage_type: ((iaas-configurations_0_deployed_cloud_storage_type))
+#   deployments_storage_account_name: ((iaas-configurations_0_deployments_storage_account_name))
+#   environment: ((iaas-configurations_0_environment))
+#   name: ((iaas-configurations_0_name))
+#   resource_group_name: ((iaas-configurations_0_resource_group_name))
+#   ssh_public_key: ((iaas-configurations_0_ssh_public_key))
+#   storage_account_type: ((iaas-configurations_0_storage_account_type))
+#   subscription_id: ((iaas-configurations_0_subscription_id))
+#   tenant_id: ((iaas-configurations_0_tenant_id))
 network-assignment:
   other_availability_zones: []
 networks-configuration:
@@ -17,9 +33,7 @@ properties-configuration:
     bosh_recreate_persistent_disks_on_next_deploy: false
     database_type: internal
     director_worker_count: 5
-    encryption:
-      keys: []
-      providers: []
+    encryption: []
     hm_emailer_options:
       enabled: false
     hm_pager_duty_options:
@@ -29,15 +43,14 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: "us.pool.ntp.org, time.google.com"
+    ntp_servers_string: ""
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false
     skip_director_drain: false
-  dns_configuration:
-    excluded_recursors: []
-    handlers: []
+  dns_configuration: []
   security_configuration:
+    generate_vm_passwords: ((properties-configuration_security_configuration_generate_vm_passwords))
     opsmanager_root_ca_trusted_certs: false
   syslog_configuration:
     enabled: false
@@ -55,4 +68,3 @@ resource-configuration:
       id: automatic
     internet_connected: false
 vmextensions-configuration: []
-# vmtypes-configuration: {}
