@@ -179,7 +179,7 @@ jobs:
           file: platform-automation-tasks/tasks/make-git-commit.yml
           input_mapping:
             repository: configuration
-            file-source: ((foundation))/generated-config
+            file-source: generated-config
           output_mapping:
             repository-commit: configuration-commit
           params:
