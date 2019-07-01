@@ -1,12 +1,10 @@
-az-configuration: 
-
-network-assignment:
-  network:
-    name: infrastructure
-  other_availability_zones:
-  - name: null
-  singleton_availability_zone:
-    name: null
+# network-assignment:
+#   network:
+#     name: infrastructure
+#   other_availability_zones:
+#   - name: null
+#   singleton_availability_zone:
+#     name: zone-1
 networks-configuration:
   icmp_checks_enabled: false
   networks:
@@ -21,20 +19,28 @@ networks-configuration:
       cloud_properties: 
         subnet_name: sandbox2-infrastructure-subnet
         virtual_network_name: sandbox2-virtual-network
-#  - name: pas
-#    subnets:
-#    - range: 10.0.0.0/22
-#      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
-#      reserved: [10.0.0.1-10.0.0.9]
-#      dns: [168.63.129.16]
-#      gateway: 10.0.0.1
-#  - name: services
-#    subnets:
-#    - range: 10.0.4.0/22
-#      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
-#      reserved: [10.0.4.1-10.0.4.9]
-#      dns: [168.63.129.16]
-#      gateway: 10.0.4.1
+  - name: pas
+    type: manual
+    subnets:
+      range: 10.0.0.0/22
+      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
+      reserved: [10.0.0.1-10.0.0.9]
+      dns: [168.63.129.16]
+      gateway: [10.0.0.1]
+      cloud_properties: 
+        subnet_name: sandbox2-pas-subnet
+        virtual_network_name: sandbox2-virtual-network
+  - name: services
+    type: manual
+    subnets:
+      range: 10.0.4.0/22
+      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
+      reserved: [10.0.4.1-10.0.4.9]
+      dns: [168.63.129.16]
+      gateway: [10.0.4.1]
+      cloud_properties: 
+        subnet_name: sandbox2-services-subnet
+        virtual_network_name: sandbox2-virtual-network
 properties-configuration:
   director_configuration:
     blobstore_type: local
