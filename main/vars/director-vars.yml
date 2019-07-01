@@ -55,4 +55,4 @@ resource-configuration:
       id: automatic
     internet_connected: false
 vmextensions-configuration: []
-vmtypes-configuration: {}
+# vmtypes-configuration: {}
