@@ -13,25 +13,25 @@ networks-configuration:
   networks:
   - name: infrastructure
     subnets:
-      # iaas_identifier: pcf-virtual-network/sandbox2-infrastructure-subnet
     - range: 10.0.8.0/27
+      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
       reserved: [10.0.8.1-10.0.8.9]
       dns: [168.63.129.16]
-      # gateway: 10.0.8.1
+      gateway: 10.0.8.1
   - name: pas
     subnets:
-      # iaas_identifier: pcf-virtual-network/sandbox2-pas-subnet
     - range: 10.0.0.0/22
+      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
       reserved: [10.0.0.1-10.0.0.9]
       dns: [168.63.129.16]
-      # gateway: 10.0.0.1
+      gateway: 10.0.0.1
   - name: services
     subnets:
-      # iaas_identifier: pcf-virtual-network/sandbox2-services-subnet
     - range: 10.0.4.0/22
+      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
       reserved: [10.0.4.1-10.0.4.9]
       dns: [168.63.129.16]
-      # gateway: 10.0.4.1
+      gateway: 10.0.4.1
 properties-configuration:
   director_configuration:
     blobstore_type: local
