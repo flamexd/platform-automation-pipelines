@@ -6,31 +6,32 @@
 # - name: zone-3
 #   iaas_configuration_guid: 18ee20e8115803415d11
 network-assignment:
-  other_availability_zones: []
+  network:
+    name: sandbox2-virtual-network
 networks-configuration:
   icmp_checks_enabled: false
   networks:
   - name: infrastructure
     subnets:
       # iaas_identifier: pcf-virtual-network/sandbox2-infrastructure-subnet
-      range: 10.0.8.0/27
+    - range: 10.0.8.0/27
       reserved: [10.0.8.1-10.0.8.9]
       dns: [168.63.129.16]
-      gateway: 10.0.8.1
+      # gateway: 10.0.8.1
   - name: pas
     subnets:
       # iaas_identifier: pcf-virtual-network/sandbox2-pas-subnet
-      range: 10.0.0.0/22
+    - range: 10.0.0.0/22
       reserved: [10.0.0.1-10.0.0.9]
       dns: [168.63.129.16]
-      gateway: 10.0.0.1
+      # gateway: 10.0.0.1
   - name: services
     subnets:
       # iaas_identifier: pcf-virtual-network/sandbox2-services-subnet
-      range: 10.0.4.0/22
+    - range: 10.0.4.0/22
       reserved: [10.0.4.1-10.0.4.9]
       dns: [168.63.129.16]
-      gateway: 10.0.4.1
+      # gateway: 10.0.4.1
 properties-configuration:
   director_configuration:
     blobstore_type: local
