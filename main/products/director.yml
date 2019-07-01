@@ -9,7 +9,28 @@ network-assignment:
   other_availability_zones: []
 networks-configuration:
   icmp_checks_enabled: false
-  networks: []
+  networks:
+  - name: infrastructure
+    subnets:
+      iaas_identifier: pcf-virtual-network/sandbox2-infrastructure-subnet
+      cidr: 10.0.8.0/27
+      reserved_ip_ranges: 10.0.8.1-10.0.8.9
+      dns: 168.63.129.16
+      gateway: 10.0.8.1
+  - name: pas
+    subnets:
+      iaas_identifier: pcf-virtual-network/sandbox2-pas-subnet
+      cidr: 10.0.0.0/22
+      reserved_ip_ranges: 10.0.0.1-10.0.0.9
+      dns: 168.63.129.16
+      gateway: 10.0.0.1
+  - name: services
+    subnets:
+      iaas_identifier: pcf-virtual-network/sandbox2-services-subnet
+      cidr: 10.0.4.0/22
+      reserved_ip_ranges: 10.0.4.1-10.0.4.9
+      dns: 168.63.129.16
+      gateway: 10.0.4.1
 properties-configuration:
   director_configuration:
     blobstore_type: local
