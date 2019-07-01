@@ -1,20 +1,26 @@
+az-configuration: 
+
 network-assignment:
   network:
-    name: i
+    name: infrastructure
+  other_availability_zones:
+  - name: null
+  singleton_availability_zone:
+    name: null
 networks-configuration:
   icmp_checks_enabled: false
   networks:
   - name: infrastructure
+    type: manual
     subnets:
-    - cloud_properties: 
+      dns: [168.63.129.16]
+      gateway: [10.0.8.1]
+      range: 10.0.8.0/27
+      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
+      reserved: [10.0.8.1-10.0.8.9]
+      cloud_properties: 
         subnet_name: sandbox2-infrastructure-subnet
         virtual_network_name: sandbox2-virtual-network
-      dns: 
-      - 168.63.129.16
-      gateway: 10.0.8.1
-      range: 10.0.8.0/27
-      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
-      # reserved: [10.0.8.1-10.0.8.9]
 #  - name: pas
 #    subnets:
 #    - range: 10.0.0.0/22
