@@ -25,7 +25,10 @@ network-assignment:
   other_availability_zones: []
 networks-configuration:
   icmp_checks_enabled: false
-  networks: []
+  networks:
+  - name: infrastructure
+  - name: pas
+  - name: services
 properties-configuration:
   director_configuration:
     blobstore_type: local
@@ -43,7 +46,7 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: ""
+    ntp_servers_string: us.pool.ntp.org, time.google.com
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false
