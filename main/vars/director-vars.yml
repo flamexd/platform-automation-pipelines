@@ -1,14 +1,14 @@
-iaas_configurations:
- - additional_cloud_properties: {}
-   bosh_storage_account_name: ((bosh_storage_account))
-   client_id: ((azure_client.username))
-   client_secret: ((azure_client.password))
-   cloud_storage_type: standard
-   default_security_group: sandbox2-bosh-deployed-vms-security-group
-   environment: AzureUSGovernment
-   resource_group_name: ((azure_resource_group))
-   ssh_public_key: ((git_user.public_key))
-   ssh_private_key: ((git_user.private_key))
-   storage_account_type: Standard_LRS
-   subscription_id: ((azure_subscription))
-   tenant_id: ((azure_tenant_id))
+iaas:
+  additional_cloud_properties: {}
+  bosh_storage_account_name: ((bosh_storage_account))
+  client_id: ((azure_client.username))
+  client_secret: ((azure_client.password))
+  cloud_storage_type: standard
+  default_security_group: sandbox2-bosh-deployed-vms-security-group
+  environment: AzureUSGovernment
+  resource_group_name: ((azure_resource_group))
+  ssh_public_key: ((git_user.public_key))
+  ssh_private_key: ((git_user.private_key))
+  storage_account_type: Standard_LRS
+  subscription_id: ((azure_subscription))
+  tenant_id: ((azure_tenant_id))

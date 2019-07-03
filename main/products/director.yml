@@ -37,20 +37,18 @@ networks-configuration:
 properties-configuration:
   iaas-configurations:
   - additional_cloud_properties: {}
-    bosh_storage_account_name: ((iaas_configurations.bosh_storage_account_name))
-    client_id: (((iaas_configuration.client_id))
-    client_secret: (((iaas_configuration.client_secret))
+    bosh_storage_account_name: ((iaas.bosh_storage_account_name))
+    client_id: (((iaas.client_id))
+    client_secret: (((iaas.client_secret))
     cloud_storage_type: standard
     default_security_group: sandbox2-bosh-deployed-vms-security-group
-    # deployed_cloud_storage_type: premium
-    # deployments_storage_account_name: pvyfbfb1cfk3cb1x8zte
     environment: AzureUSGovernment
-    resource_group_name: (((iaas_configuration.resource_group_name))
-    ssh_public_key: ((iaas_configuration.ssh_public_key)
-    ssh_private_key: ((iaas_configuration.ssh_private_key))
+    resource_group_name: (((iaas.resource_group_name))
+    ssh_public_key: ((iaas.ssh_public_key)
+    ssh_private_key: ((iaas.ssh_private_key))
     storage_account_type: Standard_LRS
-    subscription_id: ((iaas_configuration.subscription_id))
-    tenant_id: (iaas_configuration.tenant_id))
+    subscription_id: ((iaas.subscription_id))
+    tenant_id: (iaas.tenant_id))
 
   director_configuration:
     blobstore_type: local
