@@ -1,4 +1,4 @@
-iaas-configurations:
+azure-iaas-configurations:
  - additional_cloud_properties: {}
    bosh_storage_account_name: ((bosh_storage_account))
    client_id: ((azure_client.username))
