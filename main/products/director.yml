@@ -1,24 +1,29 @@
+network-assignment:
+  singleton_availability_zone:
+    name: zone-1
+  network:
+    name: sandbox2-infrastructure-subnet
 networks-configuration:
   icmp_checks_enabled: false
   networks:
   - name: infrastructure
     type: manual
     subnets:
-      dns: [168.63.129.16]
+      dns: 168.63.129.16
       gateway: [10.0.8.1]
-      range: 10.0.8.0/27
-      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
-      reserved: [10.0.8.1-10.0.8.9]
+      cidr: 10.0.8.0/27
+      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
+      reserved_ip_ranges: [10.0.8.1-10.0.8.9]
       cloud_properties: 
         subnet_name: sandbox2-infrastructure-subnet
         virtual_network_name: sandbox2-virtual-network
   - name: pas
     type: manual
     subnets:
-      range: 10.0.0.0/22
-      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
-      reserved: [10.0.0.1-10.0.0.9]
-      dns: [168.63.129.16]
+      cidr: 10.0.0.0/22
+      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
+      reserved_ip_ranges: [10.0.0.1-10.0.0.9]
+      dns: 168.63.129.16
       gateway: [10.0.0.1]
       cloud_properties: 
         subnet_name: sandbox2-pas-subnet
@@ -26,10 +31,10 @@ networks-configuration:
   - name: services
     type: manual
     subnets:
-      range: 10.0.4.0/22
-      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
-      reserved: [10.0.4.1-10.0.4.9]
-      dns: [168.63.129.16]
+      cidr: 10.0.4.0/22
+      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
+      reserved_ip_ranges: [10.0.4.1-10.0.4.9]
+      dns: 168.63.129.16
       gateway: [10.0.4.1]
       cloud_properties: 
         subnet_name: sandbox2-services-subnet
@@ -93,7 +98,7 @@ resource-configuration:
       size_mb: automatic
     instance_type:
       id: automatic
-    internet_connected: false
+    internet_connected: true
   # additional_vm_extensions:
   # - name: availability-set-properties
     # cloud_properties:
