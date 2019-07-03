@@ -93,8 +93,8 @@ resource-configuration:
     instance_type:
       id: automatic
     internet_connected: false
-vm_extensions:
-- name: availability-set-properties
-  cloud_properties:
+  additional_vm_extensions:
+  # - name: availability-set-properties
+    cloud_properties:
     availability_set: bosh-availability-set-manual
 # vmtypes-configuration: {}
