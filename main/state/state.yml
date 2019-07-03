@@ -1,1 +1,3 @@
-{"iaas": "azure", "vm_id":"sandbox2-ops-manager-vm"}
+---
+iaas: azure
+vm_id: 

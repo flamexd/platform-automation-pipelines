@@ -20,8 +20,8 @@
     # needs to be assigned to the VM.
     # It is also permissable to assign both.
 
-    public_ip: 13.72.22.230
-    private_ip: 10.0.8.4
+    public_ip: 52.247.145.45
+    # private_ip: 10.0.8.4
 
     # Note that there are several environment-specific details in this path
 
@@ -32,7 +32,7 @@
     storage_key: ((azure_opsman_blob.password))
 
     ssh_public_key: ((git_user.public_key))
-    vm_name: sandbox2-ops-manager-vm                       # default: Ops Manager-vm
+    vm_name: ops-manager-vm                       # default: Ops Manager-vm
     boot_disk_size: 100                           # default: 200
     cloud_name: AzureUSGovernment                 # default: AzureCloud
 

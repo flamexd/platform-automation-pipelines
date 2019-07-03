@@ -32,5 +32,5 @@ opsman-configuration:
     # At least one IP address (public or private)
     # needs to be assigned to the VM.
     # It is also permissable to assign both.
-    # public_ip: ((azure.public_ip))
-    private_ip: ((azure.private_ip))
+    public_ip: ((azure.public_ip))
+    # private_ip: ((azure.private_ip))
