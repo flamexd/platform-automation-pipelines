@@ -20,7 +20,7 @@
     # needs to be assigned to the VM.
     # It is also permissable to assign both.
 
-    public_ip: 52.247.145.45
+    public_ip: 52.227.152.229
     # private_ip: 10.0.8.4
 
     # Note that there are several environment-specific details in this path
