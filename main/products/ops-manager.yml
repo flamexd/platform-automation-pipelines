@@ -20,7 +20,7 @@ opsman-configuration:
     storage_key: ((azure.storage_key))
 
     ssh_public_key: ((azure.ssh_public_key))
-    vm_name: ops-manager-vm                       # default: Ops Manager-vm
+    vm_name: ops-manager-vm-2                       # default: Ops Manager-vm
     boot_disk_size: 100                           # default: 200
     cloud_name: AzureUSGovernment                 # default: AzureCloud
 
