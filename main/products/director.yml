@@ -12,7 +12,7 @@ networks-configuration:
       dns: 168.63.129.16
       gateway: [10.0.8.1]
       cidr: 10.0.8.0/27
-      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
+      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-infrastructure-subnet
       reserved_ip_ranges: [10.0.8.1-10.0.8.9]
       cloud_properties: 
         subnet_name: sandbox2-infrastructure-subnet
@@ -21,7 +21,7 @@ networks-configuration:
     type: manual
     subnets:
       cidr: 10.0.0.0/22
-      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
+      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-pas-subnet
       reserved_ip_ranges: [10.0.0.1-10.0.0.9]
       dns: 168.63.129.16
       gateway: [10.0.0.1]
@@ -32,7 +32,7 @@ networks-configuration:
     type: manual
     subnets:
       cidr: 10.0.4.0/22
-      iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
+      # iaas_identifier: sandbox2-virtual-network/subnets/sandbox2-services-subnet
       reserved_ip_ranges: [10.0.4.1-10.0.4.9]
       dns: 168.63.129.16
       gateway: [10.0.4.1]
