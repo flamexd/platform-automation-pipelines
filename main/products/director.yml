@@ -49,6 +49,7 @@ properties-configuration:
     storage_account_type: Standard_LRS
     subscription_id: ((iaas.subscription_id))
     tenant_id: (iaas.tenant_id))
+     availability_set: bosh-availability-set-manual
 
   director_configuration:
     blobstore_type: local
@@ -93,8 +94,8 @@ resource-configuration:
     instance_type:
       id: automatic
     internet_connected: false
-  additional_vm_extensions:
+  # additional_vm_extensions:
   # - name: availability-set-properties
-    cloud_properties:
-    availability_set: bosh-availability-set-manual
+    # cloud_properties:
+    # availability_set: bosh-availability-set-manual
 # vmtypes-configuration: {}
