@@ -1,58 +1,14 @@
-# az-configuration:
-# - name: zone-1
-#   iaas_configuration_guid: 18ee20e8115803415d11
-# - name: zone-2
-#   iaas_configuration_guid: 18ee20e8115803415d11
-# - name: zone-3
-#   iaas_configuration_guid: 18ee20e8115803415d11
-network-assignment:
-  other_availability_zones: []
-networks-configuration:
-  icmp_checks_enabled: false
-  networks: []
-properties-configuration:
-  director_configuration:
-    blobstore_type: local
-    bosh_recreate_on_next_deploy: false
-    bosh_recreate_persistent_disks_on_next_deploy: false
-    database_type: internal
-    director_worker_count: 5
-    encryption:
-      keys: []
-      providers: []
-    hm_emailer_options:
-      enabled: false
-    hm_pager_duty_options:
-      enabled: false
-    identification_tags: {}
-    job_configuration_on_tmpfs: false
-    keep_unreachable_vms: false
-    local_blobstore_options:
-      tls_enabled: true
-    ntp_servers_string: "us.pool.ntp.org, time.google.com"
-    post_deploy_enabled: false
-    resurrector_enabled: false
-    retry_bosh_deploys: false
-    skip_director_drain: false
-  dns_configuration:
-    excluded_recursors: []
-    handlers: []
-  security_configuration:
-    opsmanager_root_ca_trusted_certs: false
-  syslog_configuration:
-    enabled: false
-resource-configuration:
-  compilation:
-    instances: automatic
-    instance_type:
-      id: automatic
-    internet_connected: false
-  director:
-    instances: automatic
-    persistent_disk:
-      size_mb: automatic
-    instance_type:
-      id: automatic
-    internet_connected: false
-vmextensions-configuration: []
-# vmtypes-configuration: {}
+iaas-configurations:
+ - additional_cloud_properties: {}
+   bosh_storage_account_name: ((bosh_storage_account))
+   client_id: ((azure_client.username))
+   client_secret: ((azure_client.password))
+   cloud_storage_type: standard
+   default_security_group: sandbox2-bosh-deployed-vms-security-group
+   environment: AzureUSGovernment
+   resource_group_name: ((azure_resource_group))
+   ssh_public_key: ((git_user.public_key))
+   ssh_private_key: ((git_user.private_key))
+   storage_account_type: Standard_LRS
+   subscription_id: ((azure_subscription))
+   tenant_id: ((azure_tenant_id))
