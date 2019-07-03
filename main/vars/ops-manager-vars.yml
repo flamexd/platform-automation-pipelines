@@ -14,7 +14,7 @@
     location: ((azure_location))
     container: ((azure_opsman_container))                    # container for opsman image
     network_security_group: sandbox2-ops-manager-security-group
-    vpc_subnet: ((azure_vpc_subnet))
+    vpc_subnet: /subscriptions/((azure_subscription))/resourceGroups/((azure_resource_group))/providers/Microsoft.Network/virtualNetworks/((azure_resource_group))-virtual-network/subnets/((azure_resource_group))-infrastructure-subnet
 
     # At least one IP address (public or private)
     # needs to be assigned to the VM.
