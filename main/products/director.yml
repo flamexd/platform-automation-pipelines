@@ -35,7 +35,7 @@ networks-configuration:
         subnet_name: sandbox2-services-subnet
         virtual_network_name: sandbox2-virtual-network
 properties-configuration:
-  iaas_configurations:
+  iaas_configuration:
     bosh_storage_account_name: ((iaas.bosh_storage_account_name))
     client_id: ((iaas.client_id))
     client_secret: ((iaas.client_secret))
