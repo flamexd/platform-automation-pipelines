@@ -32,7 +32,7 @@
     storage_key: ((azure_opsman_blob.password))
 
     ssh_public_key: ((git_user.public_key))
-    vm_name: ops-manager-vm-2                     # default: Ops Manager-vm
+    vm_name: ops-manager-vm-3                     # default: Ops Manager-vm
     boot_disk_size: 100                           # default: 200
     cloud_name: AzureUSGovernment                 # default: AzureCloud
 

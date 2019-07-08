@@ -9,10 +9,10 @@ azure:
   client_secret: ((azure_client.password))
   location: ((azure_location))
   container: opsmanagerimage                    # container for opsman image
-  network_security_group: ops-manager-security-group
+  network_security_group: sandbox2-ops-manager-security-group
   vpc_subnet: ((azure_vpc_subnet))
-  public_ip: 13.72.22.232
-  private_ip: 10.0.8.6
+  public_ip: 52.227.152.229
+  # private_ip: 10.0.8.6
 
 azure_blob:
   username: ((azure_blob.username))

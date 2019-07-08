@@ -8,7 +8,7 @@ opsman-configuration:
     client_secret: ((azure.client_secret))
     location: ((azure.location))
     container: ((azure.container))                    # container for opsman image
-    network_security_group: ops-manager-security-group
+    network_security_group: ((azure.network_security_group))
 
     # Note that there are several environment-specific details in this path
     vpc_subnet: ((azure.vpc_subnet))
@@ -20,7 +20,7 @@ opsman-configuration:
     storage_key: ((azure.storage_key))
 
     ssh_public_key: ((azure.ssh_public_key))
-    vm_name: ops-manager-vm-2                       # default: Ops Manager-vm
+    vm_name: ((azure.vm_name))                       # default: Ops Manager-vm
     boot_disk_size: 100                           # default: 200
     cloud_name: AzureUSGovernment                 # default: AzureCloud
 
