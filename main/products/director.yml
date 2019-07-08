@@ -94,8 +94,8 @@ resource-configuration:
       id: automatic
     internet_connected: false
   # additional_vm_extensions:
-  vmextensions-configuration:
-  - name: availability-set-properties
-    cloud_properties:
-      availability_set: bosh-availability-set-manual
+vmextensions-configuration:
+- name: availability-set-properties
+  cloud_properties:
+    availability_set: bosh-availability-set-manual
 # vmtypes-configuration: {}
