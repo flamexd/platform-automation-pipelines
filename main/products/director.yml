@@ -1,3 +1,10 @@
+network-properties:
+  network:
+    name: infrastructure
+  other_availability_zones:
+  - name: "null"
+  singleton_availability_zone:
+    name: "null"
 networks-configuration:
   icmp_checks_enabled: false
   networks:
