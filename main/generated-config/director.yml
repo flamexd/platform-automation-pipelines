@@ -1,9 +1,5 @@
 az-configuration:
-- name: zone-1
-  iaas_configuration_guid: 94a273c44b3e739d6ceb
-- name: zone-2
-  iaas_configuration_guid: 94a273c44b3e739d6ceb
-- name: zone-3
+- name: Availability Sets
   iaas_configuration_guid: 94a273c44b3e739d6ceb
 iaas-configurations:
 - additional_cloud_properties: {}
@@ -22,7 +18,10 @@ iaas-configurations:
   subscription_id: ((iaas-configurations_0_subscription_id))
   tenant_id: ((iaas-configurations_0_tenant_id))
 network-assignment:
-  other_availability_zones: []
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
 networks-configuration:
   icmp_checks_enabled: false
   networks:
@@ -73,5 +72,5 @@ resource-configuration:
 vmextensions-configuration:
 - name: availability-set-properties
   cloud_properties:
-    availability_set: bosh-availability-set-manual
+    availability_set: infrastructure
 
