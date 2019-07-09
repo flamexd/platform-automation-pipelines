@@ -19,7 +19,7 @@ networks-configuration:
       cidr: 10.0.0.0/22
       dns: 168.63.129.16
       gateway: 10.0.0.1
-      reserved_ip_ranges: [10.0.0.1-10.0.0.9]
+      reserved_ip_ranges: 10.0.0.1-10.0.0.9
       # cloud_properties:
       #   subnet_name: sandbox2-pas-subnet
       #   virtual_network_name: sandbox2-virtual-network
