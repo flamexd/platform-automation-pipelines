@@ -21,7 +21,7 @@ azure_blob:
   base_url:  ((azure_blob_url))
 
 credhub:
-  server: https://credhub.control.logux.net   # CredHub endpoint
+  server: https://10.0.8.10:8844   # CredHub endpoint
   ca_cert: ((credhub_ca_cert))            # CA Cert from CredHub
   client: ((credhub_username))                 # UAA Client for CredHub access
   secret: ((credhub_password))                 # UAA secret for CredHub access
