@@ -18,7 +18,7 @@ credhub-interpolate: &credhub-interpolate
     CREDHUB_CLIENT: ((credhub.client))
     CREDHUB_SECRET: ((credhub.secret))
     PREFIX: /concourse/((foundation))
-    INTERPOLATION_PATH: ((credhub.interpolate_folders))
+    INTERPOLATION_PATHS: ((credhub.interpolate_folders))
 
 storage-params: &storage-params
   storage_account_name: ((azure_blob.username))
