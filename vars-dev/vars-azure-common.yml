@@ -1,5 +1,5 @@
 ---
-foundation: main                                       # current foundation code
+foundation: sbx                                       # current foundation code
 
 azure:
   subscription_id: ((azure_subscription))
