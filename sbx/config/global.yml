@@ -2,4 +2,4 @@
 
 # Global configs
 
-pivnet_token: d4aab53c24f943d8ae9ab2e22f2b61af-r
+pivnet_token: ((pivnet_token))
