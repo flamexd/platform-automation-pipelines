@@ -1,3 +1,6 @@
+az-configuration:
+- name: Availability Sets
+  iaas_configuration_guid: e2f59056c31816b531a9
 networks-configuration:
   icmp_checks_enabled: false
   networks:
@@ -37,7 +40,6 @@ properties-configuration:
     tenant_id: ((iaas.tenant_id))
     cloud_storage_type: managed_disks
     availability_mode: availability_sets
-
   director_configuration:
     blobstore_type: local
     bosh_recreate_on_next_deploy: false
@@ -68,6 +70,13 @@ properties-configuration:
     opsmanager_root_ca_trusted_certs: false
   syslog_configuration:
     enabled: false
+network-assignment:
+  network:
+    name: infrastructure
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
 resource-configuration:
   compilation:
     instances: automatic
