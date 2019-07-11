@@ -1,6 +1,10 @@
 network-assignment:
   network:
     name: infrastructure
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
 networks-configuration:
   icmp_checks_enabled: false
   networks:
@@ -86,4 +90,5 @@ resource-configuration:
 vmextensions-configuration:
 - name: availability-set-properties
   cloud_properties:
-    availability_set: infrastructure
+    availability_set:
+     infrastructure
