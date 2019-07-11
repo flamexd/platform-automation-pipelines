@@ -1,9 +1,5 @@
 az-configuration:
-- name: zone-1
-  iaas_configuration_guid: e2f59056c31816b531a9
-- name: zone-2
-  iaas_configuration_guid: e2f59056c31816b531a9
-- name: zone-3
+- name: Availability Sets
   iaas_configuration_guid: e2f59056c31816b531a9
 iaas-configurations:
 - additional_cloud_properties: {}
@@ -22,7 +18,12 @@ iaas-configurations:
   subscription_id: ((iaas-configurations_0_subscription_id))
   tenant_id: ((iaas-configurations_0_tenant_id))
 network-assignment:
-  other_availability_zones: []
+  network:
+    name: infrastructure
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
 networks-configuration:
   icmp_checks_enabled: false
   networks:
@@ -34,9 +35,7 @@ networks-configuration:
       gateway: 10.0.8.1
       reserved_ip_ranges: 10.0.8.1-10.0.8.9
       availability_zone_names:
-      - zone-1
-      - zone-2
-      - zone-3
+      - Availability Sets
   - name: pas
     subnets:
     - iaas_identifier: sandbox2-virtual-network/sandbox2-pas-subnet
@@ -45,9 +44,7 @@ networks-configuration:
       gateway: 10.0.0.1
       reserved_ip_ranges: 10.0.0.1-10.0.0.9
       availability_zone_names:
-      - zone-1
-      - zone-2
-      - zone-3
+      - Availability Sets
   - name: services
     subnets:
     - iaas_identifier: sandbox2-virtual-network/sandbox2-services-subnet
@@ -56,9 +53,7 @@ networks-configuration:
       gateway: 10.0.4.1
       reserved_ip_ranges: 10.0.4.1-10.0.4.9
       availability_zone_names:
-      - zone-1
-      - zone-2
-      - zone-3
+      - Availability Sets
 properties-configuration:
   director_configuration:
     blobstore_type: local
@@ -96,7 +91,7 @@ resource-configuration:
   director:
     instances: automatic
     persistent_disk:
-      size_mb: automatic
+      size_mb: "153600"
     instance_type:
       id: automatic
     internet_connected: false
