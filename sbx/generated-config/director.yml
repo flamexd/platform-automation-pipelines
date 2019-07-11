@@ -25,7 +25,40 @@ network-assignment:
   other_availability_zones: []
 networks-configuration:
   icmp_checks_enabled: false
-  networks: []
+  networks:
+  - name: infrastructure
+    subnets:
+    - iaas_identifier: sandbox2-virtual-network/sandbox2-infrastructure-subnet
+      cidr: 10.0.8.0/27
+      dns: 168.63.129.16
+      gateway: 10.0.8.1
+      reserved_ip_ranges: 10.0.8.1-10.0.8.9
+      availability_zone_names:
+      - zone-1
+      - zone-2
+      - zone-3
+  - name: pas
+    subnets:
+    - iaas_identifier: sandbox2-virtual-network/sandbox2-pas-subnet
+      cidr: 10.0.0.0/22
+      dns: 168.63.129.16
+      gateway: 10.0.0.1
+      reserved_ip_ranges: 10.0.0.1-10.0.0.9
+      availability_zone_names:
+      - zone-1
+      - zone-2
+      - zone-3
+  - name: services
+    subnets:
+    - iaas_identifier: sandbox2-virtual-network/sandbox2-services-subnet
+      cidr: 10.0.4.0/22
+      dns: 168.63.129.16
+      gateway: 10.0.4.1
+      reserved_ip_ranges: 10.0.4.1-10.0.4.9
+      availability_zone_names:
+      - zone-1
+      - zone-2
+      - zone-3
 properties-configuration:
   director_configuration:
     blobstore_type: local
@@ -43,7 +76,7 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: ""
+    ntp_servers_string: us.pool.ntp.org, time.google.com
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false
