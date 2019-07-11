@@ -5,38 +5,26 @@ networks-configuration:
   icmp_checks_enabled: false
   networks:
   - name: infrastructure
-    # type: manual
     subnets:
     - iaas_identifier: sandbox2-virtual-network/sandbox2-infrastructure-subnet
       cidr: 10.0.8.0/27
       dns: 168.63.129.16
       gateway: 10.0.8.1
       reserved_ip_ranges: 10.0.8.1-10.0.8.9
-      # cloud_properties:
-      #   subnet_name: sandbox2-infrastructure-subnet
-      #   virtual_network_name: sandbox2-virtual-network
   - name: pas
-    # type: manual
     subnets:
     - iaas_identifier: sandbox2-virtual-network/sandbox2-pas-subnet
       cidr: 10.0.0.0/22
       dns: 168.63.129.16
       gateway: 10.0.0.1
       reserved_ip_ranges: 10.0.0.1-10.0.0.9
-      # cloud_properties:
-      #   subnet_name: sandbox2-pas-subnet
-      #   virtual_network_name: sandbox2-virtual-network
   - name: services
-    # type: manual
     subnets:
     - iaas_identifier: sandbox2-virtual-network/sandbox2-services-subnet
       cidr: 10.0.4.0/22
       dns: 168.63.129.16
       gateway: 10.0.4.1
       reserved_ip_ranges: 10.0.4.1-10.0.4.9
-      # cloud_properties:
-      #   subnet_name: sandbox2-services-subnet
-      #   virtual_network_name: sandbox2-virtual-network
 properties-configuration:
   iaas_configuration:
     bosh_storage_account_name: ((iaas.bosh_storage_account_name))
@@ -95,9 +83,7 @@ resource-configuration:
     instance_type:
       id: automatic
     internet_connected: false
-  # additional_vm_extensions:
 vmextensions-configuration:
 - name: availability-set-properties
   cloud_properties:
     availability_set: infrastructure
-# vmtypes-configuration: {}
