@@ -1,7 +1,0 @@
-#!/bin/bash
-
-az storage blob download --container-name resources \
-    --file platform-automation-tasks-3.0.1.zip \
-    --name platform-automation-tasks-3.0.1.zip \
-    --account-name 2vwjhaifhaf2lu887kic \
-    --account-key TaTP5UDvjMFAhyf69syEQdqU75pq71+MH/D8GX7S5C/rks90ZuYIi6UnV5YyuvWdT9LrRq+jiUAGoHibuEV0eg==
