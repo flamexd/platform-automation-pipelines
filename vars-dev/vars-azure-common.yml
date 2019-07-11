@@ -37,7 +37,7 @@ git:
     private_key: ((git_user.private_key))             # The private for access to configuration repo
 
 opsman:
-  target: ((opsman_target))
+  target: opsman.sbx-2.logux.net
   admin_user:
     username: ((opsman_admin.username))
     password: ((opsman_admin.password))
