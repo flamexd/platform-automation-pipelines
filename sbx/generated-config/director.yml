@@ -1,6 +1,10 @@
 az-configuration:
-- name: Availability Sets
-  iaas_configuration_guid: 94a273c44b3e739d6ceb
+- name: zone-1
+  iaas_configuration_guid: e2f59056c31816b531a9
+- name: zone-2
+  iaas_configuration_guid: e2f59056c31816b531a9
+- name: zone-3
+  iaas_configuration_guid: e2f59056c31816b531a9
 iaas-configurations:
 - additional_cloud_properties: {}
   availability_mode: ((iaas-configurations_0_availability_mode))
@@ -18,16 +22,10 @@ iaas-configurations:
   subscription_id: ((iaas-configurations_0_subscription_id))
   tenant_id: ((iaas-configurations_0_tenant_id))
 network-assignment:
-  other_availability_zones:
-  - name: Availability Sets
-  singleton_availability_zone:
-    name: Availability Sets
+  other_availability_zones: []
 networks-configuration:
   icmp_checks_enabled: false
-  networks:
-  - name: infrastructure
-  - name: pas
-  - name: services
+  networks: []
 properties-configuration:
   director_configuration:
     blobstore_type: local
@@ -45,7 +43,7 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: us.pool.ntp.org, time.google.com
+    ntp_servers_string: ""
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false
@@ -69,8 +67,5 @@ resource-configuration:
     instance_type:
       id: automatic
     internet_connected: false
-vmextensions-configuration:
-- name: availability-set-properties
-  cloud_properties:
-    availability_set: infrastructure
+vmextensions-configuration: []
 
