@@ -55,7 +55,7 @@ resources:
     driver: git
     uri: ((git.configuration.uri))
     branch: master
-    private_key: ((git.private_key))
+    private_key: ((git.user.private_key))
     config_file: ((foundation))/products.yml
     config_path: products.opsman
     version_path: products.opsman.product-version
@@ -64,7 +64,7 @@ resources:
 - name: configuration
   type: git
   source:
-    private_key: ((git.private_key))
+    private_key: ((git.user.private_key))
     uri: ((git.configuration.uri))
     branch: master
     username: ((git.user.username))
