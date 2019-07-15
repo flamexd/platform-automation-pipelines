@@ -22,7 +22,7 @@ products:
     product-version: "2.3.5"
     pivnet-product-slug: elastic-runtime
     pivnet-api-token: ((pivnet_token))
-    pivnet-file-glob: "srt-*.pivotal"           # For full fledged PAS, use "cf-*.pivotal"
+    pivnet-file-glob: "cf-*.pivotal"           # For full fledged PAS, use "cf-*.pivotal"
     stemcell-iaas: azure
 
   # CSB
