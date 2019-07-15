@@ -25,7 +25,7 @@ credhub:
   ca_cert: ((credhub_ca_cert))            # CA Cert from CredHub
   client: ((credhub_username))                 # UAA Client for CredHub access
   secret: ((credhub_password))                 # UAA secret for CredHub access
-  interpolate_folders: "((foundation))/config ((foundation))/env ((foundation))/vars"  # The folders from configuration repo (see below git.configuration) to be interpolated
+  interpolate_folders: "foundation/((foundation))/config foundation/((foundation))/env foundation/((foundation))/vars"  # The folders from configuration repo (see below git.configuration) to be interpolated
 
 git:
   configuration:                                      # The configuration repo

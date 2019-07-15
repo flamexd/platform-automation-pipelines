@@ -71,7 +71,7 @@ resources:
     uri: ((git.configuration.uri))
     branch: master
     private_key: ((git.user.private_key))
-    config_file: ((foundation))/products.yml
+    config_file: foundation/((foundation))/products.yml
     config_path: products.opsman
     version_path: products.opsman.product-version
     version_pattern: "m.n.p"
@@ -116,9 +116,9 @@ jobs:
       config: configuration
       vars: interpolated-files
     params:
-      OPSMAN_CONFIG_FILE: ((foundation))/products/ops-manager.yml
+      OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
       VARS_FILES: vars/((foundation))/vars/ops-manager-vars.yml
-      STATE_FILE: ((foundation))/state/state.yml
+      STATE_FILE: fondations/((foundation))/state/state.yml
     on_success:
       do:
         - task: make-commit
@@ -131,7 +131,7 @@ jobs:
             repository-commit: configuration-commit
           params:
             FILE_SOURCE_PATH: state.yml
-            FILE_DESTINATION_PATH: ((foundation))/state/state.yml
+            FILE_DESTINATION_PATH: foundation/((foundation))/state/state.yml
             GIT_AUTHOR_EMAIL: ((git.user.email))
             GIT_AUTHOR_NAME: ((git.user.username))
             COMMIT_MESSAGE: "Add or update state file: state.yml"
@@ -147,8 +147,8 @@ jobs:
       env: interpolated-files
       config: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
-      AUTH_CONFIG_FILE: ((foundation))/config/auth.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      AUTH_CONFIG_FILE: foundation/((foundation))/config/auth.yml
 
 # 2. generate-director-config
 - name: generate-director-config
@@ -171,7 +171,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     on_success: &make-config-commit
       do:
         - task: make-commit
@@ -184,7 +184,7 @@ jobs:
             repository-commit: configuration-commit
           params:
             FILE_SOURCE_PATH: director.yml
-            FILE_DESTINATION_PATH: ((foundation))/generated-config/director.yml
+            FILE_DESTINATION_PATH: foundation((foundation))/generated-config/director.yml
             GIT_AUTHOR_EMAIL: ((git.user.email))
             GIT_AUTHOR_NAME: ((git.user.username))
             COMMIT_MESSAGE: "Add or update product config: director.yml"
@@ -215,8 +215,8 @@ jobs:
       env: interpolated-files
       vars: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
-      DIRECTOR_CONFIG_FILE: ((foundation))/products/director.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      DIRECTOR_CONFIG_FILE: foundation/((foundation))/products/director.yml
       VARS_FILES: vars/((foundation))/vars/director-vars.yml
 
 # 4. apply-director-changes
@@ -239,7 +239,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
 
 # 5. export-installation
 - name: export-installation
@@ -262,7 +262,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
       INSTALLATION_FILE: installation-after-ops-manager.zip
   - put: installation
     params:
