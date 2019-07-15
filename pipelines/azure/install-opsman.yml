@@ -106,7 +106,7 @@ jobs:
       vars: interpolated-files
     params:
       CONFIG_FILE: semver-config.yaml
-      VARS_FILES: vars/((foundation))/config/global.yml
+      VARS_FILES: vars/foundation/((foundation))/config/global.yml
   - task: create-vm
     image: platform-automation-image
     file: platform-automation-tasks/tasks/create-vm.yml
@@ -117,7 +117,7 @@ jobs:
       vars: interpolated-files
     params:
       OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
-      VARS_FILES: vars/((foundation))/vars/ops-manager-vars.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/ops-manager-vars.yml
       STATE_FILE: fondations/((foundation))/state/state.yml
     on_success:
       do:
@@ -217,7 +217,7 @@ jobs:
     params:
       ENV_FILE: foundation/((foundation))/env/env.yml
       DIRECTOR_CONFIG_FILE: foundation/((foundation))/products/director.yml
-      VARS_FILES: vars/((foundation))/vars/director-vars.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/director-vars.yml
 
 # 4. apply-director-changes
 - name: apply-director-changes
