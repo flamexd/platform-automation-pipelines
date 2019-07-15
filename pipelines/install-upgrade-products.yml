@@ -8,7 +8,6 @@
 #@ load("jobs-install-upgrade.lib.yml", "jobs")
 
 ---
-
 #! groups
 groups: #@ groups_for_install_upgrade_products()
 
