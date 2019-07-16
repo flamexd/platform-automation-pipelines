@@ -118,7 +118,7 @@ jobs:
     params:
       OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
       VARS_FILES: vars/foundation/((foundation))/vars/ops-manager-vars.yml
-      STATE_FILE: fondations/((foundation))/state/state.yml
+      STATE_FILE: foundations/((foundation))/state/state.yml
     on_success:
       do:
         - task: make-commit
