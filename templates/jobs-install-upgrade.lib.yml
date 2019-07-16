@@ -92,7 +92,7 @@ jobs:
       product: downloaded-product
       env: interpolated-files
     params:
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
   - task: stage-product
     image: platform-automation-image
     file: platform-automation-tasks/tasks/stage-product.yml
@@ -100,7 +100,7 @@ jobs:
       product: downloaded-product
       env: interpolated-files
     params:
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
   - task: upload-stemcell
     image: platform-automation-image
     file: platform-automation-tasks/tasks/upload-stemcell.yml
@@ -108,7 +108,7 @@ jobs:
       env: interpolated-files
       stemcell: downloaded-stemcell
     params:
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
 
 #! 2. generate-product-config
 - name: #@ "generate-product-config-{}".format(product_alias)
@@ -134,7 +134,7 @@ jobs:
       env: interpolated-files
     params:
       PRODUCT_NAME: #@ "{}".format(product_name)
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     on_success: #@ make_config_commit(product_slug, product_name)
 
 #! 3. configure-product
@@ -163,7 +163,7 @@ jobs:
     params:
       CONFIG_FILE: #@ "((foundation))/products/{}.yml".format(product_slug)
       VARS_FILES: #@ "vars/((foundation))/vars/{}-vars.yml".format(product_slug)
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
 
 #@ end
 #! end of for product in products():
@@ -191,7 +191,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
 
 #! 5. export-installation
 - name: export-installation
@@ -218,7 +218,7 @@ jobs:
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: env/foundation/((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
   - put: installation
     params:
       file: installation/installation-*.zip
