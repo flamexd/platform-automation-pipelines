@@ -1,6 +1,10 @@
 az-configuration:
-- name: Availability Sets
-  iaas_configuration_guid: e2f59056c31816b531a9
+- name: zone-1
+  iaas_configuration_guid: 7008088c4bb7281fcb7e
+- name: zone-2
+  iaas_configuration_guid: 7008088c4bb7281fcb7e
+- name: zone-3
+  iaas_configuration_guid: 7008088c4bb7281fcb7e
 iaas-configurations:
 - additional_cloud_properties: {}
   availability_mode: ((iaas-configurations_0_availability_mode))
@@ -18,42 +22,10 @@ iaas-configurations:
   subscription_id: ((iaas-configurations_0_subscription_id))
   tenant_id: ((iaas-configurations_0_tenant_id))
 network-assignment:
-  network:
-    name: infrastructure
-  other_availability_zones:
-  - name: Availability Sets
-  singleton_availability_zone:
-    name: Availability Sets
+  other_availability_zones: []
 networks-configuration:
   icmp_checks_enabled: false
-  networks:
-  - name: infrastructure
-    subnets:
-    - iaas_identifier: sandbox2-virtual-network/sandbox2-infrastructure-subnet
-      cidr: 10.0.8.0/27
-      dns: 168.63.129.16
-      gateway: 10.0.8.1
-      reserved_ip_ranges: 10.0.8.1-10.0.8.9
-      availability_zone_names:
-      - Availability Sets
-  - name: pas
-    subnets:
-    - iaas_identifier: sandbox2-virtual-network/sandbox2-pas-subnet
-      cidr: 10.0.0.0/22
-      dns: 168.63.129.16
-      gateway: 10.0.0.1
-      reserved_ip_ranges: 10.0.0.1-10.0.0.9
-      availability_zone_names:
-      - Availability Sets
-  - name: services
-    subnets:
-    - iaas_identifier: sandbox2-virtual-network/sandbox2-services-subnet
-      cidr: 10.0.4.0/22
-      dns: 168.63.129.16
-      gateway: 10.0.4.1
-      reserved_ip_ranges: 10.0.4.1-10.0.4.9
-      availability_zone_names:
-      - Availability Sets
+  networks: []
 properties-configuration:
   director_configuration:
     blobstore_type: local
@@ -71,7 +43,7 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: us.pool.ntp.org, time.google.com
+    ntp_servers_string: ""
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false
@@ -91,7 +63,7 @@ resource-configuration:
   director:
     instances: automatic
     persistent_disk:
-      size_mb: "153600"
+      size_mb: automatic
     instance_type:
       id: automatic
     internet_connected: false
