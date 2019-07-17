@@ -96,7 +96,7 @@ push_apps_manager_currency_lookup: '{ "usd": "$", "eur": "€" }'
 push_apps_manager_display_plan_prices: false
 push_apps_manager_enable_invitations: true
 push_apps_manager_poll_interval: 30
-route_services/enable/ignore_ssl_cert_verification: false
+route_services/enable/ignore_ssl_cert_verification: true
 route_services/enable/internal_lookup: false
 router/disable_insecure_cookies: false
 router/drain_wait: 20
@@ -111,7 +111,7 @@ router_enable_proxy: false
 router_prune_all_stale_routes: false
 routing_disable_http: false
 saml_signature_algorithm: SHA256
-secure_service_instance_credentials: false
+secure_service_instance_credentials: true
 silk_database_max_open_connections: 200
 smtp_auth_mechanism: plain
 smtp_enable_starttls_auto: false
