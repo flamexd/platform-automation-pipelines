@@ -221,7 +221,7 @@ product-properties:
   .properties.secure_service_instance_credentials:
     value: ((secure_service_instance_credentials))
   .properties.security_acknowledgement:
-    value: ((security_acknowledgement))
+    value: x
   .properties.silk_database_max_open_connections:
     value: ((silk_database_max_open_connections))
   .properties.smoke_tests:
