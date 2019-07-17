@@ -4,7 +4,7 @@ cloud_controller/apps_domain: ((cc_apps_domain))
 cloud_controller/system_domain: ((cc_system_domain))
 credhub_key_encryption_passwords_0/key: ((credhub_key_encryption_password))
 credhub_key_encryption_passwords_0/name: encryption_key
-#haproxy_forward_tls/enable/backend_ca: 
+haproxy_forward_tls/enable/backend_ca:
 mysql_monitor/recipient_email: ((pcf_admin_email))
 network_name: ((pas_network_name))
 networking_poe_ssl_certs_0/certificate: ((wildcard_cert.certificate))
@@ -159,7 +159,7 @@ diego_database_instances: automatic
 doppler_instance_type: automatic
 doppler_instances: automatic
 ha_proxy_instance_type: automatic
-ha_proxy_instances: automatic
+ha_proxy_instances: 0
 istio_control_instance_type: automatic
 istio_control_instances: automatic
 istio_router_instance_type: automatic

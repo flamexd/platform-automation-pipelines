@@ -108,8 +108,8 @@ jobs:
       env: interpolated-files
       vars: interpolated-files
     params:
-      CONFIG_FILE: #@ "((foundation))/products/{}.yml".format(product_slug)
-      VARS_FILES: #@ "vars/((foundation))/vars/{}-vars.yml".format(product_slug)
+      CONFIG_FILE: #@ "foundation/((foundation))/products/{}.yml".format(product_slug)
+      VARS_FILES: #@ "vars/foundation/((foundation))/vars/{}-vars.yml".format(product_slug)
       ENV_FILE: foundation/((foundation))/env/env.yml
 
 #@ end
