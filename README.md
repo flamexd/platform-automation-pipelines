@@ -271,6 +271,14 @@ This is also a templatized pipeline, which would respect all the setup of `insta
 
 We shouldn't expect breaking product config changes in patch versions so this pipeline can be fully automated if you want.
 
+**For LogUX**
+
+In order to broadly include Azure storage resource creds and regular expressions, make use of two operations files when `fly`ing the `install-products` pipeline.
+
+```bash
+./3-fly-install-upgrade-products.sh sbx sbx install-products ops-files/azure-storage-account.yml ops-files/resource-regexp.yml
+```
+
 ```
 $ ./4-fly-patch-products.sh dev dev patch-products
 ```
