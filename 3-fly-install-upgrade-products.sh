@@ -29,7 +29,7 @@ if [[ ${#ops_files[@]} > 0 ]]; then
 fi
 
 fly -t $concourse_target set-pipeline -p $pipeline_name \
-    -c <( ytt template \
+    -c <( ytt \
             -f pipelines/install-upgrade-products.yml \
             -f templates/functions.lib.yml \
             -f templates/groups.lib.yml \
