@@ -1,7 +1,7 @@
 ---
 # SECRET VARS
-cloud_controller/apps_domain: ((cc_apps_domain))
-cloud_controller/system_domain: ((cc_system_domain))
+cloud_controller/apps_domain: ((apps_domain))
+cloud_controller/system_domain: ((system_domain))
 credhub_key_encryption_passwords_0/key: ((credhub_key_encryption_password))
 credhub_key_encryption_passwords_0/name: encryption_key
 haproxy_forward_tls/enable/backend_ca:
