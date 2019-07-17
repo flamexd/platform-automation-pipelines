@@ -20,17 +20,20 @@ The highlights:
 
 ## Maintainer
 
-- [Bright Zheng](https://github.com/brightzheng100)
+**Originally create by**: [Bright Zheng](https://github.com/brightzheng100)
+
+**LogUX Team** has forked and maintaining a set of changes against the original which may difficult to fold in updates given the specific needs of the AF environment.
 
 
 ## Major Change Logs
 
-- [2019-02-07] Initial release
-- [2019-02-27] Added ops-files/resource-stemcell-s3.yml
-- [2019-04-17] Merged `install-product.yaml` and `upgrade-product.yaml` as one: `install-upgrade-product.yaml`
-- [2019-05-05] Added selective apply changes with optional errand control mechanism
-- [2019-05-31] Rebuilt the pipelines by introducing YAML templating, with full compatibility of GA'ed [Platform Automation for PCF v3.x](https://network.pivotal.io/products/platform-automation/)
-
+- June 2019 - Original fork github
+- July 2019
+  - creation of foundations directory to support multiple foundations
+  - multiple pipeline updates to support new directory structure
+  - removal of dynamic staged-config in `install-update-products` pipeline
+  - instructions on creating product template yml and product vars files
+  - addition of `azure-blobstore` resource-type for S3 access in pipelines
 
 ## Overview
 
@@ -158,7 +161,7 @@ Based on some real-world practices, below structure and naming pattern are my re
 │    │   └── global.yml
 │    ├── env
 │    │   └── env.yml
-│    ├── generated-config
+│    ├── generated-config (**REMOVED**)
 │    │   └── <PRODUCT-SLUG>.yml
 │    ├── products
 │    │   └── <PRODUCT-SLUG>.yml
@@ -179,20 +182,24 @@ I created a Bash file for each pipeline to `fly` with.
 
 Usage:
 
-```
+```bash
 $ fly targets
 name  url                            team  expiry
 dev   https://concourse.xxx.com      dev   Thu, 30 May 2019 14:37:16 UTC
 
 $ ./1-fly-install-opsman.sh
 USAGE: ./1-fly-install-opsman.sh <CONCOURSE_TARGET> <PLATFORM_CODE> <PIPELINE_NAME> <OPS_FILES, optional>
+```
 
 For example:
 
+```bash
 ./1-fly-install-opsman.sh dev dev install-opsman
+```
 
 Or if we have some ops files:
 
+```bash
 ./1-fly-install-opsman.sh dev dev install-opsman ops-files/a.yml ops-files/b.yml
 ```
 
@@ -271,7 +278,91 @@ This is also a templatized pipeline, which would respect all the setup of `insta
 
 We shouldn't expect breaking product config changes in patch versions so this pipeline can be fully automated if you want.
 
-**For LogUX**
+#### AF LogUX Updates
+
+##### Creating Product Templates and Vars
+
+1. Generate the PCF product template
+
+```bash
+mkdir tmp
+om config-template \
+   --pivnet-api-token NRWxxxx2XBMf \
+   --pivnet-product-slug elastic-runtime \
+   --product-version 2.6.1 \
+   --product-file-glob "cf-*.pivotal" \
+   --output-directory ./tmp
+
+cd ./tmp
+```
+
+What was constructed?
+
+```bash
+$ tree -d .
+.
+└── cf
+    └── 2.6.1
+        ├── features
+        ├── network
+        ├── optional
+        └── resource
+
+$ ls -al cf/2.6.1
+drwxr-xr-x   36 cbusch  staff   1.1K Jul 17 14:01 features
+drwxr-xr-x    4 cbusch  staff   128B Jul 17 14:01 network
+drwxr-xr-x  154 cbusch  staff   4.8K Jul 17 14:01 optional
+drwxr-xr-x   98 cbusch  staff   3.1K Jul 17 14:01 resource
+-rwxr-xr-x    1 cbusch  staff   455B Jul 17 14:01 errand-vars.yml
+-rwxr-xr-x    1 cbusch  staff   4.9K Jul 17 14:01 product-default-vars.yml
+å-rwxr-xr-x    1 cbusch  staff    17K Jul 17 14:01 product.yml
+-rwxr-xr-x    1 cbusch  staff   1.8K Jul 17 14:01 resource-vars.yml
+```
+
+2. Merge the following files into `elastic-runtime-vars.yml`
+
+```bash
+echo "# ERRAND VARS" > elastic-runtime-vars.yml
+cat cf/2.6.1/errand-vars.yml >> elastic-runtime-vars.yml
+echo -e "\n# PRODUCT DEFAULT VARS" >> elastic-runtime-vars.yml
+cat cf/2.6.1/product-default-vars.yml >> elastic-runtime-vars.yml
+echo -e "\n# RESOURCE CONFIG VARS" >> elastic-runtime-vars.yml
+cat cf/2.6.1/resource-vars.yml >> elastic-runtime-vars.yml
+```
+
+3. Move the new file to the vars directory
+
+```bash
+mv elastic-runtime-vars.yml ../platform-automation-pipelines/foundation/sbx/vars
+```
+
+4. Copy the product template to the product configuration directory
+
+```bash
+cp product.yml ../platform-automation-pipelines/foundation/sbx/products/elastic-runtime.yml
+```
+
+5. Generate and compare the placeholders in the product template to the vars file. This provides the secrets necessary for credhub.
+
+```bash
+cd ../platform-automation-pipelines
+cat foundation/sbx/vars/elastic-runtime-vars.yml | cut -d: -f1 | sort | uniq > product-vars.lst
+cat foundation/sbx/products/elastic-runtime.yml | awk -F'[(())]' '/\(\(/ {print $3}' | sort | uniq > product-template-vars.lst
+```
+
+6. Create a product secrets yml then concatentating the original products vars onto it and finally overwriting the original product vars with the one containing secrets.
+
+```bash
+diff --suppress-common-lines product-vars.lst product-template-vars.lst | grep "^<" | sed 's/^< //g' > elastic-runtime-secrets.yml
+echo "SECRET VARS" > temp-vars.yml
+cat elastic-runtime-secrets.yml >> temp-vars.yml
+echo "" >> temp-vars.yml
+cat foundation/sbx/vars/elastic-runtime-vars.yml >> temp-vars.yml
+mv temp-vars.yml foundation/sbx/vars/elastic-runtime-vars.yml
+rm elastic-runtime-secrets.yml
+```
+
+##### Deploying the Pipeline
 
 In order to broadly include Azure storage resource creds and regular expressions, make use of two operations files when `fly`ing the `install-products` pipeline.
 
