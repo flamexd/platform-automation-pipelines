@@ -20,32 +20,6 @@ params:
 #@ end
 #! end of def credhub_interpolate():
 
-
-#@ def make_config_commit(product_slug, product_name):
-do:
-  - task: make-commit
-    image: platform-automation-image
-    file: platform-automation-tasks/tasks/make-git-commit.yml
-    input_mapping:
-      repository: configuration
-      file-source: generated-config
-    output_mapping:
-      repository-commit: configuration-commit
-    params:
-      FILE_SOURCE_PATH: #@ "{}.yml".format(product_name)
-      FILE_DESTINATION_PATH: #@ "foundation/((foundation))/generated-config/{}.yml".format(product_slug)
-      GIT_AUTHOR_EMAIL: ((git.user.email))
-      GIT_AUTHOR_NAME: ((git.user.username))
-      COMMIT_MESSAGE: #@ "Add or update product config: {}.yml".format(product_slug)
-  - put: configuration
-    params:
-      repository: configuration-commit
-      merge: true
-
-#@ end
-#! end of def make_config_commit(product_slug, product_name):
-
-
 jobs:
 
 #@ def jobs():
@@ -110,34 +84,7 @@ jobs:
     params:
       ENV_FILE: foundation/((foundation))/env/env.yml
 
-#! 2. generate-product-config
-- name: #@ "generate-product-config-{}".format(product_alias)
-  serial_groups:
-  - generate-product-config
-  serial: true
-  plan:
-  - aggregate:
-    - get: #@ "product-config-{}".format(product_alias)
-      passed: 
-      - #@ "download-upload-stage-product-{}".format(product_alias)
-      trigger: true
-    - get: platform-automation-image
-      params: {unpack: true}
-    - get: platform-automation-tasks
-      params: {unpack: true}
-    - get: configuration
-  - #@ credhub_interpolate()
-  - task: staged-config
-    image: platform-automation-image
-    file: platform-automation-tasks/tasks/staged-config.yml
-    input_mapping:
-      env: interpolated-files
-    params:
-      PRODUCT_NAME: #@ "{}".format(product_name)
-      ENV_FILE: foundation/((foundation))/env/env.yml
-    on_success: #@ make_config_commit(product_slug, product_name)
-
-#! 3. configure-product
+#! 2. configure-product
 - name: #@ "configure-product-{}".format(product_alias)
   serial_groups:
   - configure-product
@@ -146,7 +93,7 @@ jobs:
   - aggregate:
     - get: #@ "product-config-{}".format(product_alias)
       passed:
-      - #@ "generate-product-config-{}".format(product_alias)
+      - #@ "download-upload-stage-product-{}".format(product_alias)
     - get: platform-automation-image
       params: {unpack: true}
     - get: platform-automation-tasks
@@ -168,7 +115,7 @@ jobs:
 #@ end
 #! end of for product in products():
 
-#! 4. apply-product-changes
+#! 3. apply-product-changes
 - name: apply-product-changes
   serial: true
   plan:
@@ -193,7 +140,7 @@ jobs:
     params:
       ENV_FILE: foundation/((foundation))/env/env.yml
 
-#! 5. export-installation
+#! 4. export-installation
 - name: export-installation
   serial: true
   plan:

@@ -12,7 +12,7 @@ groups:
   jobs:
   #@ for product in products():
   #@ product_alias="{}".format(product).split("|")[0]
-  #@ for job in ["download-upload-stage-product", "generate-product-config", "configure-product"]:
+  #@ for job in ["download-upload-stage-product", "configure-product"]:
   - #@ "{}-{}".format(job, product_alias)
   #@ end
   #! end of for job in []
@@ -27,7 +27,7 @@ groups:
 - name: #@ product_alias
   jobs:
 
-  #@ for job in ["download-upload-stage-product", "generate-product-config", "configure-product"]:
+  #@ for job in ["download-upload-stage-product", "configure-product"]:
   - #@ "{}-{}".format(job, product_alias)
   #@ end
   #! end of for job in []
