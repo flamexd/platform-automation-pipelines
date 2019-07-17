@@ -1,0 +1,11 @@
+- op: add
+  path: /resources/name=platform-automation-tasks/source/regexp
+  value: ".*tasks-(.*).zip"
+
+- op: add
+  path: /resources/name=platform-automation-image/source/regexp
+  value: ".*image-(.*).tgz"
+
+- op: add
+  path: /resources/name=installation/source/regexp
+  value: "installation-(.*).zip"

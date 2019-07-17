@@ -9,29 +9,14 @@ resources:
 - name: platform-automation-tasks
   type: azure-blobstore
   source:
-    regexp: .*tasks-(.*).zip
-    storage_account_name: ((azure_blob.username))
-    storage_account_key: ((azure_blob.password))
-    container: ((azure_blob_container))
-    base_url: ((azure_blob_url))
 
 - name: platform-automation-image
   type: azure-blobstore
   source:
-    regexp: .*image-(.*).tgz
-    storage_account_name: ((azure_blob.username))
-    storage_account_key: ((azure_blob.password))
-    container: ((azure_blob_container))
-    base_url: ((azure_blob_url))
 
 - name: installation
   type: azure-blobstore
   source:
-    regexp: installation-(.*).zip
-    storage_account_name: ((azure_blob.username))
-    storage_account_key: ((azure_blob.password))
-    container: ((azure_blob_container))
-    base_url: ((azure_blob_url))
 
 - name: configuration
   type: git
