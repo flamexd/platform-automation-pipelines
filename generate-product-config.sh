@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 pivnet_api_token="$1"
 product_slug="$2"
