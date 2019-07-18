@@ -1,0 +1,14 @@
+# SECRET VARS
+network_name: ((pas_network_name))
+singleton_availability_zone: 
+
+# ERRAND VARS
+delete-all_pre_delete_state: default
+deploy-all_post_deploy_state: default
+
+# PRODUCT DEFAULT VARS
+credhub_broker_enable_global_access_to_plans: true
+
+# RESOURCE CONFIG VARS
+delete-all_instance_type: automatic
+deploy-all_instance_type: automatic
