@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#set -eux
+set -eux
 
 pivnet_api_token="$1"
 product_slug="$2"
@@ -39,7 +39,7 @@ if [ $? -ne 0 ]; then
 fi
 
 cd "${tempdir}" || exit
-proddir="$(ls)/${product_version}"
+proddir="$(ls)/$(ls $(ls))"
 
 # copy the product template to the proper product name
 echo "INFO: Copying the ${proddir}/product.yml file to ${product_slug}.yml file..."
