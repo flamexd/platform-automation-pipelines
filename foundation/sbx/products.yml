@@ -30,13 +30,22 @@ products:
     product-version: "1.3.2"
     pivnet-product-slug: credhub-service-broker
     pivnet-api-token: ((pivnet_token))
-    pivnet-file-glob: "*.pivotal"
+    pivnet-file-glob: "credhub*.pivotal"
     stemcell-iaas: azure
 
-  # Redis
-  redis:
-    product-version: "2.0.1"
-    pivnet-product-slug: p-redis
+
+  # MySQL
+  mysql:
+    product-version: "2.6.0"
+    pivnet-product-slug: pivotal-mysql
     pivnet-api-token: ((pivnet_token))
-    pivnet-file-glob: "*.pivotal"
+    pivnet-file-glob: "pivotal-mysql*.pivotal"
     stemcell-iaas: azure
+
+  # # Redis
+  # redis:
+  #   product-version: "2.0.1"
+  #   pivnet-product-slug: p-redis
+  #   pivnet-api-token: ((pivnet_token))
+  #   pivnet-file-glob: "*.pivotal"
+  #   stemcell-iaas: azure

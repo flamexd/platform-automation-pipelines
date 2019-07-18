@@ -32,8 +32,11 @@ products:
 #! CSB
 - csb|credhub-service-broker
 
+#! MySQL
+- mysql|pivotal-mysql
+
 #! Redis
-- redis|p-redis
+#! - redis|p-redis
 
 #! PKS
 #! - pks|pivotal-container-service
