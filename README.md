@@ -301,22 +301,16 @@ What was constructed?
 ```bash
 $ tree -d .
 .
-└── cf
-    └── 2.6.1
+└── <product-slug>
+    └── <product-version>
         ├── features
         ├── network
         ├── optional
-        └── resource
-
-$ ls -al cf/2.6.1
-drwxr-xr-x   36 cbusch  staff   1.1K Jul 17 14:01 features
-drwxr-xr-x    4 cbusch  staff   128B Jul 17 14:01 network
-drwxr-xr-x  154 cbusch  staff   4.8K Jul 17 14:01 optional
-drwxr-xr-x   98 cbusch  staff   3.1K Jul 17 14:01 resource
--rwxr-xr-x    1 cbusch  staff   455B Jul 17 14:01 errand-vars.yml
--rwxr-xr-x    1 cbusch  staff   4.9K Jul 17 14:01 product-default-vars.yml
-å-rwxr-xr-x    1 cbusch  staff    17K Jul 17 14:01 product.yml
--rwxr-xr-x    1 cbusch  staff   1.8K Jul 17 14:01 resource-vars.yml
+        ├── resource
+        ├── errand-vars.yml
+        ├── product-default-vars.yml
+        ├── product.yml
+        └── resource-vars.yml
 ```
 
 2. Merge the following files into `elastic-runtime-vars.yml`
@@ -361,6 +355,8 @@ cat foundation/sbx/vars/elastic-runtime-vars.yml >> temp-vars.yml
 mv temp-vars.yml foundation/sbx/vars/elastic-runtime-vars.yml
 rm elastic-runtime-secrets.yml
 ```
+
+> NOTE: See `generate-product-config.sh` to handle this process in an automated fashion.
 
 ##### Deploying the Pipeline
 
