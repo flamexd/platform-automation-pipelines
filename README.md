@@ -291,9 +291,7 @@ om config-template \
    --pivnet-product-slug elastic-runtime \
    --product-version 2.6.1 \
    --product-file-glob "cf-*.pivotal" \
-   --output-directory ./tmp
-
-cd ./tmp
+   --output-directory ./elastic-runtime
 ```
 
 What was constructed?
@@ -303,57 +301,58 @@ $ tree -d .
 .
 └── <product-slug>
     └── <product-version>
-        ├── features
-        ├── network
-        ├── optional
-        ├── resource
-        ├── errand-vars.yml
-        ├── product-default-vars.yml
-        ├── product.yml
-        └── resource-vars.yml
+        ├── features  # feature operations files
+        ├── network   # network operations files
+        ├── optional  # other operations files
+        ├── resource  # resource operations files
+        ├── errand-vars.yml           # errand settings
+        ├── product-default-vars.yml  # general product settings
+        ├── product.yml               # product configuration
+        └── resource-vars.yml         # resource config settings
 ```
 
-2. Merge the following files into `elastic-runtime-vars.yml`
-
-```bash
-echo "# ERRAND VARS" > elastic-runtime-vars.yml
-cat cf/2.6.1/errand-vars.yml >> elastic-runtime-vars.yml
-echo -e "\n# PRODUCT DEFAULT VARS" >> elastic-runtime-vars.yml
-cat cf/2.6.1/product-default-vars.yml >> elastic-runtime-vars.yml
-echo -e "\n# RESOURCE CONFIG VARS" >> elastic-runtime-vars.yml
-cat cf/2.6.1/resource-vars.yml >> elastic-runtime-vars.yml
-```
-
-3. Move the new file to the vars directory
-
-```bash
-mv elastic-runtime-vars.yml ../platform-automation-pipelines/foundation/sbx/vars
-```
-
-4. Copy the product template to the product configuration directory
+2. Copy the product template to the product configuration directory
 
 ```bash
 cp product.yml ../platform-automation-pipelines/foundation/sbx/products/elastic-runtime.yml
 ```
 
-5. Generate and compare the placeholders in the product template to the vars file. This provides the secrets necessary for credhub.
+3. Merge the following files into `elastic-runtime-vars.yml`
 
 ```bash
-cd ../platform-automation-pipelines
-cat foundation/sbx/vars/elastic-runtime-vars.yml | cut -d: -f1 | sort | uniq > product-vars.lst
-cat foundation/sbx/products/elastic-runtime.yml | awk -F'[(())]' '/\(\(/ {print $3}' | sort | uniq > product-template-vars.lst
+{ echo "# ERRAND VARS"; \
+  cat "${proddir}"/errand-vars.yml; \
+  echo -e "\n# PRODUCT DEFAULT VARS"; \
+  cat "${proddir}"/product-default-vars.yml; \
+  echo -e "\n# RESOURCE CONFIG VARS"; \
+  cat "${proddir}"/resource-vars.yml; } \
+  >> elastic-runtime-vars.yml
 ```
 
-6. Create a product secrets yml then concatentating the original products vars onto it and finally overwriting the original product vars with the one containing secrets.
+4. Generate and compare the placeholders in the product template to the vars file. This identifies the secrets necessary for credhub.
 
 ```bash
-diff --suppress-common-lines product-vars.lst product-template-vars.lst | grep "^<" | sed 's/^< //g' > elastic-runtime-secrets.yml
-echo "SECRET VARS" > temp-vars.yml
-cat elastic-runtime-secrets.yml >> temp-vars.yml
-echo "" >> temp-vars.yml
-cat foundation/sbx/vars/elastic-runtime-vars.yml >> temp-vars.yml
-mv temp-vars.yml foundation/sbx/vars/elastic-runtime-vars.yml
-rm elastic-runtime-secrets.yml
+cat elastic-runtime-vars.yml | grep -Ev "^#|^ " | cut -d: -f1 | sort | uniq > product-vars.lst
+cat elastic-runtime.yml | awk -F'[(())]' '/\(\(/ {print $3}' | sort | uniq > product-template-vars.lst
+```
+
+5. Create a product secrets yml then concatenate the original products vars onto it. Once created, the vars file will have a secrets section at the top which will need to have Credhub credientials assigned to them.
+
+```bash
+diff --suppress-common-lines product-vars.lst product-template-vars.lst | grep "^>" | sed 's/^> //g' > secrets.yml
+
+{ echo "# SECRET VARS"; \
+  cat secrets.yml; \
+  echo ""; \
+  cat elastic-runtime-vars.yml; } \
+  >> elastic-runtime-vars.yml
+```
+
+6. Move the new files to the `foundations/<foundation>/` directory structure.
+
+```bash
+mv elastic-runtime.yml <platform-automation-pipelines>/foundation/<foundation>/products
+mv elastic-runtime-vars.yml <platform-automation-pipelines>/foundation/<foundation>/vars
 ```
 
 > NOTE: See `generate-product-config.sh` to handle this process in an automated fashion.
