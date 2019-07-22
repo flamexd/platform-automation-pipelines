@@ -8,6 +8,7 @@ service_network_name: ((service_network_name))
 singleton_availability_zone: ((azure_availability_sets))
 backup_account_name: ((backup_accountname))
 backup_container_name: ((backup_container_name))
+backup_blobstore_url: ((backup_blobstore_url))
 azure_storage_access_key_secret: ((azure_storage_access_key_secret))
 
 # ERRAND VARS

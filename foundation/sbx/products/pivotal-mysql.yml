@@ -24,6 +24,8 @@ product-properties:
     value: 0 */8 * * *
   .properties.backups_selector.azure.enable_email_alerts:
     value: false
+  .properties.backups_selector.azure.endpoint:
+    value: ((backup_blobstore_url))
   .properties.backups_selector.azure.path:
     value: mysql-backup
   .properties.backups_selector.azure.storage_access_key:
