@@ -393,6 +393,9 @@ resource-config:
     instance_type:
       id: ((router_instance_type))
     instances: ((router_instances))
+    internet_connected: false
+    elb_names:
+    - ((router_lb_name))
   syslog_adapter:
     instance_type:
       id: ((syslog_adapter_instance_type))
