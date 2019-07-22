@@ -13,6 +13,22 @@ product-properties:
     value: ((allow_lower_case_table_names_via_config_param))
   .properties.audit_logging_enabled:
     value: ((audit_logging_enabled))
+  .properties.backups_selector:
+    selected_option: azure
+    value: Azure Backups
+  .properties.backups_selector.azure.account:
+    value: ((backup_account_name))
+  .properties.backups_selector.azure.container:
+    value: ((backup_container_name))
+  .properties.backups_selector.azure.cron_schedule:
+    value: 0 */8 * * *
+  .properties.backups_selector.azure.enable_email_alerts:
+    value: false
+  .properties.backups_selector.azure.path:
+    value: mysql-backup
+  .properties.backups_selector.azure.storage_access_key:
+    value:
+      secret: ((azure_storage_access_key_secret))
   .properties.canary_instances:
     value: ((canary_instances))
   .properties.deprecated_bindings_string:
@@ -41,34 +57,16 @@ product-properties:
     value: ((plan1_selector/single_node/az_multi_select))
   .properties.plan1_selector.single_node.description:
     value: ((plan1_selector/single_node/description))
+  .properties.plan1_selector.single_node.instance_limit:
+    value: ((plan1_selector/single_node/instance_limit))
   .properties.plan1_selector.single_node.name:
     value: ((plan1_selector/single_node/name))
   .properties.plan1_selector.single_node.paid_plan:
     value: ((plan1_selector/single_node/paid_plan))
   .properties.plan2_selector:
-    value: single_node
-  .properties.plan2_selector.single_node.access_dropdown:
-    value: ((plan2_selector/single_node/access_dropdown))
-  .properties.plan2_selector.single_node.az_multi_select:
-    value: ((plan2_selector/single_node/az_multi_select))
-  .properties.plan2_selector.single_node.description:
-    value: ((plan2_selector/single_node/description))
-  .properties.plan2_selector.single_node.name:
-    value: ((plan2_selector/single_node/name))
-  .properties.plan2_selector.single_node.paid_plan:
-    value: ((plan2_selector/single_node/paid_plan))
+    value: Inactive
   .properties.plan3_selector:
-    value: single_node
-  .properties.plan3_selector.single_node.access_dropdown:
-    value: ((plan3_selector/single_node/access_dropdown))
-  .properties.plan3_selector.single_node.az_multi_select:
-    value: ((plan3_selector/single_node/az_multi_select))
-  .properties.plan3_selector.single_node.description:
-    value: ((plan3_selector/single_node/description))
-  .properties.plan3_selector.single_node.name:
-    value: ((plan3_selector/single_node/name))
-  .properties.plan3_selector.single_node.paid_plan:
-    value: ((plan3_selector/single_node/paid_plan))
+    value: Inactive
   .properties.plan4_selector:
     value: Inactive
   .properties.plan5_selector:
