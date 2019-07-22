@@ -182,6 +182,7 @@ route_syncer_instance_type: automatic
 route_syncer_instances: automatic
 router_instance_type: automatic
 router_instances: automatic
+router_lb_name: ((router_lb_name))
 syslog_adapter_instance_type: automatic
 syslog_adapter_instances: automatic
 syslog_scheduler_instance_type: automatic
