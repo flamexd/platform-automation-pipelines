@@ -1,12 +1,16 @@
 # SECRET VARS
-deprecated_bindings_string:
+deprecated_bindings_string: X
 global_recipient_email: ((pcf_admin_email))
 network_name: ((pas_network_name))
-plan1_selector/single_node/az_multi_select:
-plan2_selector/single_node/az_multi_select:
-plan3_selector/single_node/az_multi_select:
+plan1_selector/single_node/az_multi_select: ((azure_availability_sets))
+plan2_selector/single_node/az_multi_select: ((azure_availability_sets))
+plan3_selector/single_node/az_multi_select: ((azure_availability_sets))
 service_network_name: ((service_network_name))
-singleton_availability_zone:
+singleton_availability_zone: ((azure_availability_sets))
+backup_account_name: ((backup_accountname))
+backup_container_name: ((backup_container_name))
+azure_storage_access_key_secret: ((azure_storage_access_key_secret))
+
 
 # ERRAND VARS
 delete-all-service-instances-and-deregister-broker_pre_delete_state: default
