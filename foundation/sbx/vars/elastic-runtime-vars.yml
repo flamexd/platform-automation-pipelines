@@ -11,7 +11,7 @@ networking_poe_ssl_certs_0/certificate: ((wildcard_cert.certificate))
 networking_poe_ssl_certs_0/privatekey: ((wildcard_cert.private_key))
 networking_poe_ssl_certs_0/name: wildcard_cert
 #security_acknowledgement:
-singleton_availability_zone: 
+singleton_availability_zone: ((azure_availability_sets))
 uaa/service_provider_key_credentials/certificate: ((wildcard_cert.certificate))
 uaa/service_provider_key_credentials/privatekey: ((wildcard_cert.private_key))
 
