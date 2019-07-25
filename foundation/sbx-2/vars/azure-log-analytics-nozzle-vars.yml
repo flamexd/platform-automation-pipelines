@@ -1,5 +1,5 @@
 ---
-workspace_id: 01f5a6e1-cce1-46c5-8021-39049f04d524
+workspace_id: 671f93e2-3a96-43b5-a2d4-bdf3521933ea
 foundation: ((foundation))
 properties_firehose_user_password:
   secret: ((properties_firehose_user_password.secret))
