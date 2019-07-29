@@ -1,3 +1,4 @@
+---
 # SECRET VARS
 network_name: ((pas_network_name))
 singleton_availability_zone: ((azure_availability_sets))

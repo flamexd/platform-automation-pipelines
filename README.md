@@ -231,8 +231,8 @@ For those, say `s3_secret_access_key`, `git_private_key`, we should store and ma
 
 This pipeline is dedicated for installation of OpsMan and OpsMan Director.
 
-```
-$ ./1-fly-install-opsman.sh dev dev install-opsman
+```bash
+$ fly -t sbx sp -p install-opsman-azure -c pipelines/install-opsman.yml -l foundation/sbx/common-vars.yml -l foundation/sbx/products-vars.yml
 ```
 
 > Note: If you want to customize the pipeline, say to retrieve products and stemcells from S3 instead of default [Pivnet](https://network.pivotal.io), please refer to [here](#available-ops-files) for how.

@@ -1,155 +1,195 @@
 ---
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Reusable anchors                                                  │
+#│                                                                   │
+#├ storage-params:                                                   │
+#│ └── Params for Azure Storage                                      │
+#├ credhub-interpolate                                               │
+#│ └── Common configuration file interpolation                       │
+#└───────────────────────────────────────────────────────────────────┘
 
-resource_types:
-# A custom Concourse Resource type for detecting Semver-based config
-# Ref: https://github.com/brightzheng100/semver-config-concourse-resource
-- name: semver-config
-  type: docker-image
-  source:
-    repository: itstarting/semver-config-concourse-resource
+storage-params: &storage-params
+  storage_account_name: ((azure_blob.username))
+  storage_account_key: ((azure_blob.password))
+  container: ((azure_blob_container))
+  base_url: ((azure_blob_url))
 
-resources:
-- name: platform-automation-tasks
-  type: s3
-  source:
-    endpoint: ((s3.endpoint))
-    region_name: ((s3.region_name))
-    access_key_id: ((s3.access_key_id))
-    secret_access_key: ((s3.secret_access_key))
-    bucket: ((s3.buckets.platform_automation))
-    regexp: .*tasks-(.*).zip
-
-- name: platform-automation-image
-  type: s3
-  source:
-    endpoint: ((s3.endpoint))
-    region_name: ((s3.region_name))
-    access_key_id: ((s3.access_key_id))
-    secret_access_key: ((s3.secret_access_key))
-    bucket: ((s3.buckets.platform_automation))
-    regexp: .*image-(.*).tgz
-
-- name: installation-before
-  type: s3
-  source:
-    endpoint: ((s3.endpoint))
-    region_name: ((s3.region_name))
-    access_key_id: ((s3.access_key_id))
-    secret_access_key: ((s3.secret_access_key))
-    bucket: ((s3.buckets.foundation))
-    regexp: installation-before-(.*).zip
-
-- name: installation-after
-  type: s3
-  source:
-    endpoint: ((s3.endpoint))
-    region_name: ((s3.region_name))
-    access_key_id: ((s3.access_key_id))
-    secret_access_key: ((s3.secret_access_key))
-    bucket: ((s3.buckets.foundation))
-    regexp: installation-after-(.*).zip
-
-- name: product-config-opsman
-  type: semver-config
-  source:
-    driver: git
-    uri: ((git.configuration.uri))
-    branch: master
-    private_key: ((git.user.private_key))
-    config_file: ((foundation))/products.yml
-    config_path: products.opsman
-    version_path: products.opsman.product-version
-    version_pattern: "m.n.p"
-
-- name: configuration
-  type: git
-  source:
-    private_key: ((git.user.private_key))
-    uri: ((git.configuration.uri))
-    branch: master
-    username: ((git.user.username))
-
-# reusable stuff
 credhub-interpolate: &credhub-interpolate
   image: platform-automation-image
   file: platform-automation-tasks/tasks/credhub-interpolate.yml
   input_mapping:
-    files: configuration
+    files: platform-automation-pipelines
   params:
     CREDHUB_SERVER: ((credhub.server))
     CREDHUB_CA_CERT: ((credhub.ca_cert))
     CREDHUB_CLIENT: ((credhub.client))
     CREDHUB_SECRET: ((credhub.secret))
     PREFIX: /concourse/((foundation))
-    INTERPOLATION_PATH: ((credhub.interpolate_folders))
+    INTERPOLATION_PATHS: ((credhub.interpolate_folders))
 
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Resource Types not included with Concourse                        │
+#│                                                                   │
+#├ azure-blobstore:                                                  │
+#│ ├── Necessary to access the Azure Blobstore containers and its    │
+#│ └── container image is stored in a private docker registry.       │
+#└───────────────────────────────────────────────────────────────────┘
+resource_types:
+- name: azure-blobstore
+  type: docker-image
+  source:
+    username: admin
+    password: ((harbor_password))
+    client_certs:
+    - domain: ((harbor_uri))
+      cert: |
+        ((control-plane-ssl-cert))
+      key: |
+        ((control-plane-ssl-key))
+    ca_certs:
+    - domain: ((harbor_uri))
+      cert: |
+        ((control-plane-ca-cert))
+    repository: ((harbor_uri))/azure/azure-blobstore-resource
+    tag: latest
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Resources for OpsManager Jobs                                     │
+#│                                                                   │
+#├ git:                                                              │
+#│ └── Configuration for OpsMan Automation                           │
+#├ azure-blobstore:                                                  │
+#│ ├── Platform Automation Tasks used in pipeline jobs/tasks         │
+#│ ├── Platform Automation Image used by most tasks                  │
+#│ ├── Installation.zip before upgrade                               │
+#│ ├── Installation.zip after upgrade                                │
+#│ └── Operations Manager Image (.yml)                               │
+#└───────────────────────────────────────────────────────────────────┘
+resources:
+# GIT REPO
+- name: platform-automation-pipelines
+  type: git
+  source:
+    private_key: ((git.user.private_key))
+    uri: ((git.configuration.uri))
+    branch: master
+
+# PLATFORM AUTOMATION
+- name: platform-automation-tasks
+  type: azure-blobstore
+  source:
+    regexp: .*tasks-(.*).zip
+    <<: *storage-params
+
+- name: platform-automation-image
+  type: azure-blobstore
+  source:
+    regexp: .*image-(.*).tgz
+    <<: *storage-params
+
+# INSTALLATION BACKUP FILES
+- name: installation-before
+  type: azure-blobstore
+  source:
+    regexp: installation-before-(.*).zip
+    <<: *storage-params
+
+- name: installation-after
+  type: azure-blobstore
+  source:
+    regexp: installation-after-(.*).zip
+    <<: *storage-params
+
+# OPSMAN IMAGE
+- name: opsman-image
+  type: azure-blobstore
+  source:
+    regexp: ((products.opsman.product-regex))
+    <<: *storage-params
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Jobs for Operations Manager Install Workflow                      │
+#│                                                                   │
+#├ Create OpsMan VM and Configuration Authentication                 │
+#│ ├── Generate (interpolate) environment files                      │
+#│ ├── Create the VM and save state.yml to Azure Blobstore           │
+#│ └── Configure the initial authentication mode for OpsMan          │
+#│                                                                   │
+#├ Configure the BOSH Director                                       │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Configure the director                                        │
+#│                                                                   │
+#├ Apply the Director Changes:                                       │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Apply changes for director deploying bosh                     │
+#│                                                                   │
+#├ Export the Installation                                           │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Export the installation file, store in Azure Blobstore        │
+#└───────────────────────────────────────────────────────────────────┘
 jobs:
-# 1. export-installation-before
+
+# Export PCF Installation Before Upgrading
 - name: export-installation-before
   serial: true
   plan:
   - aggregate:
-    - get: product-config-opsman
+    - get: opsman-image
       trigger: true
     - get: platform-automation-image
-      params: {unpack: true}
+      params: { unpack: true }
     - get: platform-automation-tasks
-      params: {unpack: true}
-    - get: configuration
+      params: { unpack: true }
+    - get: platform-automation-pipelines
+
   - task: credhub-interpolate
     <<: *credhub-interpolate
+
   - task: export-installation
     image: platform-automation-image
     file: platform-automation-tasks/tasks/export-installation.yml
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
       INSTALLATION_FILE: installation-before-ops-manager-upgrade.zip
   - put: installation-before
     params:
       file: installation/installation-before-ops-manager-upgrade.zip
 
-# 2. upgrade-opsman
+# UPGRADE OpsMan
 - name: upgrade-opsman
   serial: true
   plan:
   - aggregate:
-    - get: product-config-opsman
-      passed: [export-installation-before]
+    - get: opsman-image
+      passed: [ export-installation-before ]
       trigger: true
     - get: platform-automation-image
-      params: {unpack: true}
+      params: { unpack: true }
     - get: platform-automation-tasks
-      params: {unpack: true}
+      params: { unpack: true }
     - get: installation-before
-    - get: configuration
+    - get: platform-automation-pipelines
+
   - task: credhub-interpolate
     <<: *credhub-interpolate
-  - task: download-product
-    image: platform-automation-image
-    file: platform-automation-tasks/tasks/download-product.yml
-    input_mapping:
-      config: product-config-opsman
-      vars: interpolated-files
-    params:
-      CONFIG_FILE: semver-config.yaml
-      VARS_FILES: vars/((foundation))/config/global.yml
+
   - task: upgrade-opsman
     image: platform-automation-image
     file: platform-automation-tasks/tasks/upgrade-opsman.yml
     input_mapping:
-      image: downloaded-product
-      state: configuration
-      config: configuration
+      image: opsman-image
+      state: platform-automation-pipelines
+      config: platform-automation-pipelines
       env: interpolated-files
       vars: interpolated-files
       installation: installation-before
     params:
-      OPSMAN_CONFIG_FILE: ((foundation))/products/ops-manager.yml
-      VARS_FILES: vars/((foundation))/vars/ops-manager-vars.yml
-      ENV_FILE: ((foundation))/env/env.yml
-      STATE_FILE: ((foundation))/state/state.yml
+      OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/ops-manager-vars.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      STATE_FILE: foundation/((foundation))/state/state.yml
       INSTALLATION_FILE: installation-before-ops-manager-upgrade.zip
     on_success:
       do:
@@ -157,144 +197,96 @@ jobs:
           image: platform-automation-image
           file: platform-automation-tasks/tasks/make-git-commit.yml
           input_mapping:
-            repository: configuration
+            repository: platform-automation-pipelines
             file-source: generated-state
           output_mapping:
             repository-commit: configuration-commit-state
           params:
             FILE_SOURCE_PATH: state.yml
-            FILE_DESTINATION_PATH: ((foundation))/state/state.yml
+            FILE_DESTINATION_PATH: foundation/((foundation))/state/state.yml
             GIT_AUTHOR_EMAIL: ((git.user.email))
             GIT_AUTHOR_NAME: ((git.user.username))
             COMMIT_MESSAGE: "Update state file after ops-manager upgrade"
-        - put: configuration
+        - put: platform-automation-pipelines
           params:
             repository: configuration-commit-state
             merge: true
-        - task: staged-director-config
-          image: platform-automation-image
-          file: platform-automation-tasks/tasks/staged-director-config.yml
-          input_mapping:
-            env: interpolated-files
-          params:
-            ENV_FILE: ((foundation))/env/env.yml
-        - task: make-commit-before
-          image: platform-automation-image
-          file: platform-automation-tasks/tasks/make-git-commit.yml
-          input_mapping:
-            repository: configuration
-            file-source: generated-config
-          output_mapping:
-            repository-commit: configuration-commit
-          params:
-            FILE_SOURCE_PATH: director.yml
-            FILE_DESTINATION_PATH: ((foundation))/generated-config/director.yml
-            GIT_AUTHOR_EMAIL: ((git.user.email))
-            GIT_AUTHOR_NAME: ((git.user.username))
-            COMMIT_MESSAGE: "Add or update product config: director.yml"
-        - put: configuration
-          params:
-            repository: configuration-commit
-            merge: true
 
-# 3. configure-director
+# CONFIGURE the BOSH DIRECTOR
 - name: configure-director
   serial: true
   plan:
   - aggregate:
-    - get: product-config-opsman
-      passed: [upgrade-opsman]
-      trigger: true
     - get: platform-automation-image
-      params: {unpack: true}
+      params: { unpack: true }
     - get: platform-automation-tasks
-      params: {unpack: true}
-    - get: configuration
+      params: { unpack: true }
+    - get: platform-automation-pipelines
+      passed: [ upgrade-opsman ]
+      trigger: true
+
   - task: credhub-interpolate
     <<: *credhub-interpolate
+
   - task: configure-director
     image: platform-automation-image
     file: platform-automation-tasks/tasks/configure-director.yml
     input_mapping:
-      config: configuration
+      config: platform-automation-pipelines
       env: interpolated-files
       vars: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
-      DIRECTOR_CONFIG_FILE: ((foundation))/products/director.yml
-      VARS_FILES: vars/((foundation))/vars/director-vars.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      DIRECTOR_CONFIG_FILE: foundation/((foundation))/products/director.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/director-vars.yml
 
-# 4. apply-director-changes
+# APPLY the DIRECTOR CHANGES
 - name: apply-director-changes
   serial: true
   plan:
   - aggregate:
-    - get: product-config-opsman
-      passed: [configure-director]
     - get: platform-automation-image
-      params: {unpack: true}
+      params: { unpack: true }
     - get: platform-automation-tasks
-      params: {unpack: true}
-    - get: configuration
+      params: { unpack: true }
+    - get: platform-automation-pipelines
+      passed: [ configure-director ]
+      trigger: true
+
   - task: credhub-interpolate
     <<: *credhub-interpolate
+
   - task: apply-director-changes
     image: platform-automation-image
     file: platform-automation-tasks/tasks/apply-director-changes.yml
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
-    on_success:
-      do:
-        - task: staged-director-config
-          image: platform-automation-image
-          file: platform-automation-tasks/tasks/staged-director-config.yml
-          input_mapping:
-            env: interpolated-files
-          params:
-            ENV_FILE: ((foundation))/env/env.yml
-        - task: make-commit-after
-          image: platform-automation-image
-          file: platform-automation-tasks/tasks/make-git-commit.yml
-          input_mapping:
-            repository: configuration
-            file-source: generated-config
-          output_mapping:
-            repository-commit: configuration-commit
-          params:
-            FILE_SOURCE_PATH: director.yml
-            FILE_DESTINATION_PATH: ((foundation))/generated-config/director.yml
-            GIT_AUTHOR_EMAIL: ((git.user.email))
-            GIT_AUTHOR_NAME: ((git.user.username))
-            COMMIT_MESSAGE: "Add or update product config: director.yml"
-        - put: configuration
-          params:
-            repository: configuration-commit
-            merge: true
+      ENV_FILE: foundation/((foundation))/env/env.yml
 
-# 5 export-installation-after
+# EXPORT the INSTALLATION AFTER
 - name: export-installation-after
   serial: true
   plan:
   - aggregate:
-    - get: product-config-opsman
-      passed: [apply-director-changes]
-      trigger: true
     - get: platform-automation-image
-      params: {unpack: true}
+      params: { unpack: true }
     - get: platform-automation-tasks
-      params: {unpack: true}
-    - get: configuration
+      params: { unpack: true }
+    - get: platform-automation-pipelines
+      passed: [ apply-director-changes ]
+      trigger: true
+
   - task: credhub-interpolate
     <<: *credhub-interpolate
+
   - task: export-installation
     image: platform-automation-image
     file: platform-automation-tasks/tasks/export-installation.yml
     input_mapping:
       env: interpolated-files
     params:
-      ENV_FILE: ((foundation))/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
       INSTALLATION_FILE: installation-after-ops-manager-upgrade.zip
   - put: installation-after
     params:

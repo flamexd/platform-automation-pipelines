@@ -1,21 +1,506 @@
-#! ----------------------------------------------------
-#! master pipeline file for `install-upgrade-products`
-#! ----------------------------------------------------
-
-#@ load("groups.lib.yml", "groups_for_install_upgrade_products")
-#@ load("resource-types.lib.yml", "resource_types")
-#@ load("resources-install-upgrade.lib.yml", "resources")
-#@ load("jobs-install-upgrade.lib.yml", "jobs")
-
 ---
-#! groups
-groups: #@ groups_for_install_upgrade_products()
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Groups for Organizing Concourse                                   │
+#│                                                                   │
+#├ All:                                                              │
+#│ └── Contains entire job workflow within pipeline                  │
+#├ PAS                                                               │
+#│ └── Job workflow for Pivotal Application Service                  │
+#├ Credhub-SB                                                        │
+#│ └── Job workflow for Credhub Service Broker                       │
+#├ MySQL                                                             │
+#│ └── Job workflow for MySQL for Pivotal                            │
+#├ Apply-Changes                                                     │
+#│ └── Job workflow to apply changes and export the installation     │
+#└───────────────────────────────────────────────────────────────────┘
+groups:
+- name: All
+  jobs:
+  - upload-stage-product-pas
+  - configure-product-pas
+  - upload-stage-product-csb
+  - configure-product-csb
+  - upload-stage-product-mysql
+  - configure-product-mysql
+  - apply-product-changes
+  - export-installation
+- name: PAS
+  jobs:
+  - upload-stage-product-pas
+  - configure-product-pas
+- name: Credhub-SB
+  jobs:
+  - upload-stage-product-csb
+  - configure-product-csb
+- name: MySQL
+  jobs:
+  - upload-stage-product-mysql
+  - configure-product-mysql
+- name: Apply-Changes
+  jobs:
+  - apply-product-changes
+  - export-installation
 
-#! resource_types
-resource_types: #@ resource_types()
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Reusable anchors                                                  │
+#│                                                                   │
+#├ storage-params:                                                   │
+#│ └── Params for Azure Storage                                      │
+#├ credhub-interpolate                                               │
+#│ └── Common configuration file interpolation                       │
+#└───────────────────────────────────────────────────────────────────┘
 
-#! resources
-resources: #@ resources()
+storage-params: &storage-params
+  storage_account_name: ((azure_blob.username))
+  storage_account_key: ((azure_blob.password))
+  container: ((azure_blob_container))
+  base_url: ((azure_blob_url))
 
-#! jobs
-jobs: #@ jobs()
+credhub-interpolate: &credhub-interpolate
+  file: platform-automation-tasks/tasks/credhub-interpolate.yml
+  params:
+    CREDHUB_CA_CERT: ((credhub_ca_cert))
+    CREDHUB_CLIENT: ((credhub_username))
+    CREDHUB_SECRET: ((credhub_password))
+    CREDHUB_SERVER: ((credhub_endpoint))
+    INTERPOLATION_PATHS: foundation/((foundation))/config foundation/((foundation))/env
+      foundation/((foundation))/vars
+    PREFIX: /concourse/sbx
+  input_mapping:
+    files: platform-automation-pipelines
+  image: platform-automation-image
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Resource Types not included with Concourse                        │
+#│                                                                   │
+#├ azure-blobstore:                                                  │
+#│ ├── Necessary to access the Azure Blobstore containers and its    │
+#│ └── container image is stored in a private docker registry.       │
+#└───────────────────────────────────────────────────────────────────┘
+resource_types:
+- name: azure-blobstore
+  type: docker-image
+  source:
+    username: admin
+    password: ((harbor_password))
+    client_certs:
+    - domain: ((harbor_uri))
+      cert: |
+        ((control-plane-ssl-cert))
+      key: |
+        ((control-plane-ssl-key))
+    ca_certs:
+    - domain: ((harbor_uri))
+      cert: |
+        ((control-plane-ca-cert))
+    repository: ((harbor_uri))/azure/azure-blobstore-resource
+    tag: latest
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Resources for Product Jobs                                        │
+#│                                                                   │
+#├ git:                                                              │
+#│ └── Configuration for OpsMan Automation                           │
+#├ azure-blobstore:                                                  │
+#│ ├── Platform Automation Tasks used in pipeline jobs/tasks         │
+#│ ├── Platform Automation Image used by most tasks                  │
+#│ ├── Installation storage                                          │
+#│ ├── PAS product (.pivotal)                                        │
+#│ ├── PAS stemcell (.tgz)                                           │
+#│ ├── Credhub Service Broker product (.pivotal)                     │
+#│ ├── Credhub Service Broker stemcell (.tgz)                        │
+#│ ├── MySQL product (.pivotal)                                      │
+#│ └── MySQL stemcell (.tgz)                                         │
+#└───────────────────────────────────────────────────────────────────┘
+resources:
+# GIT REPO
+- name: platform-automation-pipelines
+  type: git
+  source:
+    branch: master
+    private_key: ((git_user.private_key))
+    uri: ((git.configuration.uri))
+
+# PLATFORM AUTOMATION
+- name: platform-automation-tasks
+  type: azure-blobstore
+  source:
+    regexp: .*tasks-(.*).zip
+    <<: *storage-params
+
+- name: platform-automation-image
+  type: azure-blobstore
+  source:
+    regexp: .*image-(.*).tgz
+    <<: *storage-params
+
+# INSTALLATION BACKUP FILES
+- name: installation
+  type: azure-blobstore
+  source:
+    regexp: installation-(.*).zip
+    <<: *storage-params
+
+# PAS
+- name: pas-product
+  type: azure-blobstore
+  source:
+    regexp: ((products.pas.product-regex))
+    <<: *storage-params
+
+- name: pas-stemcell
+  type: azure-blobstore
+  source:
+    regexp: ((products.pas.stemcell-regex))
+    <<: *storage-params
+
+# CREDHUB SERVICE BROKER
+- name: credhubsb-product
+  type: azure-blobstore
+  source:
+    regexp: ((products.credhubsb.product-regex))
+    <<: *storage-params
+
+- name: credhubsb-stemcell
+  type: azure-blobstore
+  source:
+    regexp: ((products.credhubsb.stemcell-regex))
+    <<: *storage-params
+
+# MYSQL
+- name: mysql-product
+  type: azure-blobstore
+  source:
+    regexp: ((products.mysql.product-regex))
+    <<: *storage-params
+
+- name: mysql-stemcell
+  type: azure-blobstore
+  source:
+    regexp: ((products.mysql.stemcell-regex))
+    <<: *storage-params
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Jobs for Product Installation Workflow                            │
+#│                                                                   │
+#├ Update and Stage Product PAS                                      │
+#│ ├── Generate (interpolate) environment files                      │
+#│ ├── Upload the product                                            │
+#│ ├── Stage the product                                             │
+#│ └── Upload the stemcell                                           │
+#├ Configure the Product PAS:                                        │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Configure the product                                         │
+#│                                                                   │
+#├ Update and Stage Product Credhub Service Broker                   │
+#│ ├── Generate (interpolate) environment files                      │
+#│ ├── Upload the product                                            │
+#│ ├── Stage the product                                             │
+#│ └── Upload the stemcell                                           │
+#├ Configure the Product Credhub Service Broker:                     │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Configure the product                                         │
+#│                                                                   │
+#├ Update and Stage Product MySQL for Pivotal                        │
+#│ ├── Generate (interpolate) environment files                      │
+#│ ├── Upload the product                                            │
+#│ ├── Stage the product                                             │
+#│ └── Upload the stemcell                                           │
+#├ Configure the Product MySQL for Pivotal:                          │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Configure the product                                         │
+#│                                                                   │
+#├ Apply Product Changes:                                            │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Apply changes for all products                                │
+#├ Export the Installation                                           │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Export the installation file, store in Azure Blobstore        │
+#└───────────────────────────────────────────────────────────────────┘
+jobs:
+
+# PAS
+- name: upload-stage-product-pas
+  serial: true
+  plan:
+  - aggregate:
+    - get: pas-product
+      trigger: true
+    - get: pas-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: upload-product
+    file: platform-automation-tasks/tasks/upload-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: pas-product
+    image: platform-automation-image
+
+  - task: stage-product
+    file: platform-automation-tasks/tasks/stage-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: pas-product
+    image: platform-automation-image
+
+  - task: upload-stemcell
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      stemcell: pas-stemcell
+    image: platform-automation-image
+
+- name: configure-product-pas
+  serial: true
+  plan:
+  - aggregate:
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      passed: [ upload-stage-product-pas ]
+      trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: configure-product
+    file: platform-automation-tasks/tasks/configure-product.yml
+    params:
+      CONFIG_FILE: foundation/sbx/products/elastic-runtime.yml
+      ENV_FILE: foundation/sbx/env/env.yml
+      VARS_FILES: vars/foundation/sbx/vars/elastic-runtime-vars.yml
+    input_mapping:
+      config: platform-automation-pipelines
+      env: interpolated-files
+      vars: interpolated-files
+    image: platform-automation-image
+
+# CREDHUB SERVICE BROKER
+- name: upload-stage-product-csb
+  serial: true
+  plan:
+  - aggregate:
+    - get: credhubsb-product
+    - get: credhubsb-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      # passed: [ configure-product-pas ]
+      # trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: upload-product
+    file: platform-automation-tasks/tasks/upload-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: credhubsb-product
+    image: platform-automation-image
+
+  - task: stage-product
+    file: platform-automation-tasks/tasks/stage-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: credhubsb-product
+    image: platform-automation-image
+
+  - task: upload-stemcell
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      stemcell: credhubsb-stemcell
+    image: platform-automation-image
+
+- name: configure-product-csb
+  serial: true
+  plan:
+  - aggregate:
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      passed: [ upload-stage-product-csb ]
+      trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: configure-product
+    file: platform-automation-tasks/tasks/configure-product.yml
+    params:
+      CONFIG_FILE: foundation/sbx/products/credhub-service-broker.yml
+      ENV_FILE: foundation/sbx/env/env.yml
+      VARS_FILES: vars/foundation/sbx/vars/credhub-service-broker-vars.yml
+    input_mapping:
+      config: platform-automation-pipelines
+      env: interpolated-files
+      vars: interpolated-files
+    image: platform-automation-image
+
+# MYSQL
+- name: upload-stage-product-mysql
+  serial: true
+  plan:
+  - aggregate:
+    - get: mysql-product
+    - get: mysql-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      # passed: [ configure-product-csb ]
+      # trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: upload-product
+    file: platform-automation-tasks/tasks/upload-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: mysql-product
+    image: platform-automation-image
+
+  - task: stage-product
+    file: platform-automation-tasks/tasks/stage-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: mysql-product
+    image: platform-automation-image
+
+  - task: upload-stemcell
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      stemcell: mysql-stemcell
+    image: platform-automation-image
+
+- name: configure-product-mysql
+  serial: true
+  plan:
+  - aggregate:
+    - get: mysql-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      passed: [ upload-stage-product-mysql ]
+      trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: configure-product
+    file: platform-automation-tasks/tasks/configure-product.yml
+    params:
+      CONFIG_FILE: foundation/sbx/products/pivotal-mysql.yml
+      ENV_FILE: foundation/sbx/env/env.yml
+      VARS_FILES: vars/foundation/sbx/vars/pivotal-mysql-vars.yml
+    input_mapping:
+      config: platform-automation-pipelines
+      env: interpolated-files
+      vars: interpolated-files
+    image: platform-automation-image
+
+
+# APPLY CHANGES
+- name: apply-product-changes
+  serial: true
+  plan:
+  - aggregate:
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      # passed: [ configure-product-mysql ]
+      # trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: apply-product-changes
+    file: platform-automation-tasks/tasks/apply-changes.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+    image: platform-automation-image
+
+# EXPORT INSTALLATION FILE AND STORE IN AZURE BLOBSTORE
+- name: export-installation
+  serial: true
+  plan:
+  - aggregate:
+    - get: platform-automation-image
+      passed: [ apply-product-changes ]
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      passed: [ apply-product-changes ]
+      trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: export-installation
+    file: platform-automation-tasks/tasks/export-installation.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+    image: platform-automation-image
+  - put: installation
+    params:
+      file: installation/installation-*.zip
+
