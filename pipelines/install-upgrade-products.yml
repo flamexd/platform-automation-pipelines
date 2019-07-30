@@ -22,6 +22,8 @@ groups:
   - configure-product-csb
   - upload-stage-product-mysql
   - configure-product-mysql
+  - upload-stage-product-lanozzle
+  - configure-product-lanozzle
   - apply-product-changes
   - export-installation
 - name: PAS
@@ -36,6 +38,10 @@ groups:
   jobs:
   - upload-stage-product-mysql
   - configure-product-mysql
+- name: Log Analytics
+  jobs:
+  - upload-stage-product-lanozzle
+  - configure-product-lanozzle
 - name: Apply-Changes
   jobs:
   - apply-product-changes
@@ -110,7 +116,9 @@ resource_types:
 #│ ├── Credhub Service Broker product (.pivotal)                     │
 #│ ├── Credhub Service Broker stemcell (.tgz)                        │
 #│ ├── MySQL product (.pivotal)                                      │
-#│ └── MySQL stemcell (.tgz)                                         │
+#│ ├── MySQL stemcell (.tgz)                                         │
+#│ ├── Log Analytics Nozzle product (.pivotal)                       │
+#│ └── Log Analytics nozzle stemcell (.tgz)                          │
 #└───────────────────────────────────────────────────────────────────┘
 resources:
 # GIT REPO
@@ -180,6 +188,19 @@ resources:
     regexp: ((products.mysql.stemcell-regex))
     <<: *storage-params
 
+# LOG ANALYTICS NOZZLE
+- name: lanozzle-product
+  type: azure-blobstore
+  source:
+    regexp: ((products.lanozzle.product-regex))
+    <<: *storage-params
+
+- name: lanozzle-stemcell
+  type: azure-blobstore
+  source:
+    regexp: ((products.lanozzle.stemcell-regex))
+    <<: *storage-params
+
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Product Installation Workflow                            │
 #│                                                                   │
@@ -207,6 +228,15 @@ resources:
 #│ ├── Stage the product                                             │
 #│ └── Upload the stemcell                                           │
 #├ Configure the Product MySQL for Pivotal:                          │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Configure the product                                         │
+#│                                                                   │
+#├ Update and Stage Product Log Analytics Nozzle for Pivotal         │
+#│ ├── Generate (interpolate) environment files                      │
+#│ ├── Upload the product                                            │
+#│ ├── Stage the product                                             │
+#│ └── Upload the stemcell                                           │
+#├ Configure the Product Log Analytics Nozzle for Pivotal:           │
 #│ ├── Generate (interpolate) environment files                      │
 #│ └── Configure the product                                         │
 #│                                                                   │
@@ -441,6 +471,81 @@ jobs:
       CONFIG_FILE: foundation/sbx/products/pivotal-mysql.yml
       ENV_FILE: foundation/sbx/env/env.yml
       VARS_FILES: vars/foundation/sbx/vars/pivotal-mysql-vars.yml
+    input_mapping:
+      config: platform-automation-pipelines
+      env: interpolated-files
+      vars: interpolated-files
+    image: platform-automation-image
+
+# Log Analytics Nozzle
+- name: upload-stage-product-lanozzle
+  serial: true
+  plan:
+  - aggregate:
+    - get: lanozzle-product
+    - get: lanozzle-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: upload-product
+    file: platform-automation-tasks/tasks/upload-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: lanozzle-product
+    image: platform-automation-image
+
+  - task: stage-product
+    file: platform-automation-tasks/tasks/stage-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: lanozzle-product
+    image: platform-automation-image
+
+  - task: upload-stemcell
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      stemcell: lanozzle-stemcell
+    image: platform-automation-image
+
+- name: configure-product-lanozzle
+  serial: true
+  plan:
+  - aggregate:
+    - get: lanozzle-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      passed: [ upload-stage-product-lanozzle ]
+      trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: configure-product
+    file: platform-automation-tasks/tasks/configure-product.yml
+    params:
+      CONFIG_FILE: foundation/sbx/products/azure-log-analytics-nozzle.yml
+      ENV_FILE: foundation/sbx/env/env.yml
+      VARS_FILES: vars/foundation/sbx/vars/azure-log-analytics-nozzle-vars.yml
     input_mapping:
       config: platform-automation-pipelines
       env: interpolated-files

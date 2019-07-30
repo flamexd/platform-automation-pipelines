@@ -24,6 +24,12 @@ products:
     product-regex: pivotal-mysql-(2.6.*).pivotal
     stemcell-regex: bosh-stemcell-(170.*)-azure-(.*).tgz
 
+  # Log Analytics Nozzle
+  lanozzle:
+    product-version: 1.4.1
+    product-regex: azure-log-analytics-nozzle-(1.4.*).pivotal
+    stemcell-regex: bosh-stemcell-(315.*)-azure-(.*).tgz
+
   # # Redis
   # redis:
   #   product-version: 2.0.1
