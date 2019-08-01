@@ -10,6 +10,8 @@
 #│ └── Job workflow for Credhub Service Broker                       │
 #├ MySQL                                                             │
 #│ └── Job workflow for MySQL for Pivotal                            │
+#├ PCS                                                               │
+#│ └── Job workflow for p-compliance-scanner for Pivotal             │
 #├ Apply-Changes                                                     │
 #│ └── Job workflow to apply changes and export the installation     │
 #└───────────────────────────────────────────────────────────────────┘
@@ -24,12 +26,18 @@ groups:
   - configure-product-mysql
   - upload-stage-product-lanozzle
   - configure-product-lanozzle
+  - upload-stage-product-pcs
+  - configure-product-pcs
   - apply-product-changes
   - export-installation
 - name: PAS
   jobs:
   - upload-stage-product-pas
   - configure-product-pas
+- name: Compliance Scanner
+  jobs:
+  - upload-stage-product-pcs
+  - configure-product-pcs
 - name: Credhub-SB
   jobs:
   - upload-stage-product-csb
@@ -126,13 +134,15 @@ resource_types:
 #│ ├── MySQL stemcell (.tgz)                                         │
 #│ ├── Log Analytics Nozzle product (.pivotal)                       │
 #│ └── Log Analytics nozzle stemcell (.tgz)                          │
+#│ ├── PCS product (.pivotal)                                        │
+#│ └── PCS stemcell (.tgz)                                           │
 #└───────────────────────────────────────────────────────────────────┘
 resources:
 # GIT REPO
 - name: platform-automation-pipelines
   type: git
   source:
-    branch: master
+    branch: ((git.configuration.branch))
     private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
 
@@ -208,6 +218,19 @@ resources:
     regexp: ((products.lanozzle.stemcell-regex))
     <<: *deploy-storage-params
 
+# PCS
+- name: pcs-product
+  type: azure-blobstore
+  source:
+    regexp: ((products.pcs.product-regex))
+    <<: *storage-params
+
+- name: pcs-stemcell
+  type: azure-blobstore
+  source:
+    regexp: ((products.pcs.stemcell-regex))
+    <<: *storage-params
+
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Product Installation Workflow                            │
 #│                                                                   │
@@ -243,7 +266,18 @@ resources:
 #│ ├── Upload the product                                            │
 #│ ├── Stage the product                                             │
 #│ └── Upload the stemcell                                           │
+#│                                                                   │
+#├ Update and Stage Product PCS (p-compliance-scanner                │
+#│ ├── Generate (interpolate) environment files                      │
+#│ ├── Upload the product                                            │
+#│ ├── Stage the product                                             │
+#│ └── Upload the stemcell                                           │
+#│                                                                   │
 #├ Configure the Product Log Analytics Nozzle for Pivotal:           │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Configure the product                                         │
+#│                                                                   │
+#├ Configure the Product PCS (p-compliance-scanner)                  │
 #│ ├── Generate (interpolate) environment files                      │
 #│ └── Configure the product                                         │
 #│                                                                   │
@@ -559,6 +593,81 @@ jobs:
       vars: interpolated-files
     image: platform-automation-image
 
+# Pivotal Compliance Scanner
+- name: upload-stage-product-pcs
+  serial: true
+  plan:
+  - aggregate:
+    - get: pcs-product
+    - get: pcs-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: upload-product
+    file: platform-automation-tasks/tasks/upload-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: pcs-product
+    image: platform-automation-image
+
+  - task: stage-product
+    file: platform-automation-tasks/tasks/stage-product.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      product: pcs-product
+    image: platform-automation-image
+
+  - task: upload-stemcell
+    file: platform-automation-tasks/tasks/upload-stemcell.yml
+    params:
+      ENV_FILE: foundation/sbx/env/env.yml
+    input_mapping:
+      env: interpolated-files
+      stemcell: pcs-stemcell
+    image: platform-automation-image
+
+- name: configure-product-pcs
+  serial: true
+  plan:
+  - aggregate:
+    - get: pcs-stemcell
+    - get: platform-automation-image
+      params:
+        unpack: true
+    - get: platform-automation-tasks
+      params:
+        unpack: true
+    - get: platform-automation-pipelines
+      passed: [ upload-stage-product-pcs ]
+      trigger: true
+
+  - task: credhub-interpolate
+    <<: *credhub-interpolate
+
+  - task: configure-product
+    file: platform-automation-tasks/tasks/configure-product.yml
+    params:
+      CONFIG_FILE: foundation/sbx/products/pivotal-pcs.yml
+      ENV_FILE: foundation/sbx/env/env.yml
+      VARS_FILES: vars/foundation/sbx/vars/pivotal-pcs-vars.yml
+    input_mapping:
+      config: platform-automation-pipelines
+      env: interpolated-files
+      vars: interpolated-files
+    image: platform-automation-image
+
 
 # APPLY CHANGES
 - name: apply-product-changes
@@ -615,4 +724,3 @@ jobs:
   - put: installation
     params:
       file: installation/installation-*.zip
-
