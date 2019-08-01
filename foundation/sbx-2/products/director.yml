@@ -3,21 +3,21 @@ networks-configuration:
   networks:
   - name: infrastructure
     subnets:
-    - iaas_identifier: sandbox2-virtual-network/sandbox2-infrastructure-subnet
+    - iaas_identifier: sbx-2-virtual-network/sbx-2-infrastructure-subnet
       cidr: 10.0.8.0/27
       dns: 168.63.129.16
       gateway: 10.0.8.1
       reserved_ip_ranges: 10.0.8.1-10.0.8.9
   - name: pas
     subnets:
-    - iaas_identifier: sandbox2-virtual-network/sandbox2-pas-subnet
+    - iaas_identifier: sbx-2-virtual-network/sbx-2-pas-subnet
       cidr: 10.0.0.0/22
       dns: 168.63.129.16
       gateway: 10.0.0.1
       reserved_ip_ranges: 10.0.0.1-10.0.0.9
   - name: services
     subnets:
-    - iaas_identifier: sandbox2-virtual-network/sandbox2-services-subnet
+    - iaas_identifier: sbx-2-virtual-network/sbx-2-services-subnet
       cidr: 10.0.4.0/22
       dns: 168.63.129.16
       gateway: 10.0.4.1
@@ -28,7 +28,7 @@ properties-configuration:
     client_id: ((iaas.client_id))
     client_secret: ((iaas.client_secret))
     storage_account_type: Standard_LRS
-    default_security_group: sandbox2-bosh-deployed-vms-security-group
+    default_security_group: ((iaas.default_security_group))
     environment: AzureUSGovernment
     resource_group_name: ((iaas.resource_group_name))
     ssh_public_key: ((iaas.ssh_public_key))

@@ -4,6 +4,6 @@
     name: platform-automation-tasks
     type: git
     source:
-      private_key: ((git.user.private_key))
+      private_key: ((git_user.private_key))
       uri: ((git.platform_automation_tasks.uri))
       branch: master

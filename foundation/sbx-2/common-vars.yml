@@ -1,0 +1,69 @@
+---
+foundation: ((foundation))                                       # current foundation code
+
+azure_storage_accounts:
+  state:  # All state files (terraform [tfstate], p-automator [state.yml], opsmgr [installation.zip])
+    username: ((azure-state-storage-account.username))
+    password: ((azure-state-storage-account.password))
+  deploy: # Products and backups (product [product images], mysql-backup, credhub-backup containers)
+    username: ((azure-deploy-storage-account.username))
+    password: ((azure-deploy-storage-account.password))
+  opsman: # OpsMan (bosh, stemcell containers)
+    username: ((azure-opsman-storage-account.username))
+    password: ((azure-opsman-storage-account.password))
+  pas:    # PAS (buildpacks, droplets, packages, resources containers)
+    username: ((azure-pas-storage-account.username))
+    password: ((azure-pas-storage-account.password))
+  base_url: core.usgovcloudapi.net
+
+credhub:
+  server: ((credhub_endpoint))   # CredHub endpoint
+  ca_cert: ((credhub_ca_cert))            # CA Cert from CredHub
+  client: ((credhub_username))                 # UAA Client for CredHub access
+  secret: ((credhub_password))                 # UAA secret for CredHub access
+  interpolate_folders: "foundation/((foundation))/config foundation/((foundation))/env foundation/((foundation))/vars"
+  # The folders from configuration repo (see below git.configuration) to be interpolated
+
+git:
+  configuration:                                      # The configuration repo
+    uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/platform-automation-pipelines
+   # products_file: products.yml                       # The products yaml file that used to track for version changes
+  user:                                               # The user for access to configuration repo
+    email: ((git_email))                  # a dummy email will work if we're using private_key for authentication
+    username: ((git_username))                   # a dummy username will work if we're using private_key for authentication
+    private_key: ((git_user.private_key))             # The private for access to configuration repo
+    public_key: ((git_user.public_key))
+
+# opsman:
+#   target: ((opsman_target))
+#   admin_user:
+#     username: ((opsman_admin.username))
+#     password: ((opsman_admin.password))
+
+# pivnet:
+#   token: ((pivnet_token))
+
+# schedule:
+#   patch:                                              # Patch scheduler, the whole chunk will be used as ((schedule.patch))
+#     start: 12:00 AM                                   # by following Time Resource https://github.com/concourse/time-resource
+#     stop: 1:00 AM
+#     location: Asia/Singapore
+
+# azure:
+#   subscription_id: ((azure_subscription))
+#   resource_group: ((azure_resource_group))
+#   tenant_id: ((azure_tenant_id))
+#   client_id: ((azure_client.username))
+#   client_secret: ((azure_client.password))
+#   location: ((azure_location))
+#   container: opsmanagerimage
+#   network_security_group: ((om_security_group))
+#   vpc_subnet: ((azure_vpc_subnet))
+#   public_ip: ((om_external_ip))
+#   private_ip: 10.0.8.6
+
+# azure_blob:
+#   username: ((azure_blob.username))
+#   password: ((azure_blob.password))
+#   container: ((azure_blob_container))
+#   base_url:  ((azure_blob_url))

@@ -12,24 +12,23 @@ azure:
   client_id: ((azure_client.username))
   client_secret: ((azure_client.password))
   location: ((azure_location))
-  container: ((azure_opsman_container))                    # container for opsman image
-  network_security_group: sandbox2-ops-manager-security-group
+  network_security_group: sbx-2-ops-manager-security-group
   vpc_subnet: /subscriptions/((azure_subscription))/resourceGroups/((azure_resource_group))/providers/Microsoft.Network/virtualNetworks/((azure_resource_group))-virtual-network/subnets/((azure_resource_group))-infrastructure-subnet
 
   # At least one IP address (public or private)
   # needs to be assigned to the VM.
   # It is also permissable to assign both.
 
-  public_ip: 52.227.152.229
+  public_ip: ((om_external_ip))  # 52.227.152.229
   # private_ip: 10.0.8.4
 
-  # Note that there are several environment-specific details in this path
-
-  storage_account: ((azure_opsman_blob.username))                      # account name of container
-
-  # Optional
-  # only needed if your client doesn't have the needed storage permissions
-  storage_key: ((azure_opsman_blob.password))
+  # blobstore where opsman image (yml) can be found
+  storage_account: ((azure-deploy-storage-account.username))
+  storage_key:     ((azure-deploy-storage-account.password))
+  container:       product
+  # storage_account: ((azure_opsman_blob.username))                      # account name of container
+  # storage_key: ((azure_opsman_blob.password))
+  # container: ((azure_opsman_container))                    # container for opsman image
 
   ssh_public_key: ((git_user.public_key))
   vm_name: ops-manager-vm-3                     # default: Ops Manager-vm

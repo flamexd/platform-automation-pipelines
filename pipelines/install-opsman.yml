@@ -2,17 +2,25 @@
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Reusable anchors                                                  │
 #│                                                                   │
-#├ storage-params:                                                   │
-#│ └── Params for Azure Storage                                      │
+#├ deploy-storage-params:                                            │
+#│ └── Params for Azure Storage for products to deploy               │
+#├ install-storage-params:                                           │
+#│ └── Params for Azure Storage for installation*.zip location       │
 #├ credhub-interpolate                                               │
 #│ └── Common configuration file interpolation                       │
 #└───────────────────────────────────────────────────────────────────┘
 
-storage-params: &storage-params
-  storage_account_name: ((azure_blob.username))
-  storage_account_key: ((azure_blob.password))
-  container: ((azure_blob_container))
-  base_url: ((azure_blob_url))
+deploy-storage-params: &deploy-storage-params
+  storage_account_name: ((azure_storage_accounts.deploy.username))
+  storage_account_key: ((azure_storage_accounts.deploy.password))
+  container: product
+  base_url: ((azure_storage_accounts.base_url))
+
+install-storage-params: &install-storage-params
+  storage_account_name: ((azure_storage_accounts.state.username))
+  storage_account_key: ((azure_storage_accounts.state.password))
+  container: opsmgr
+  base_url: ((azure_storage_accounts.base_url))
 
 credhub-interpolate: &credhub-interpolate
   image: platform-automation-image
@@ -69,7 +77,7 @@ resources:
 - name: platform-automation-pipelines
   type: git
   source:
-    private_key: ((git.user.private_key))
+    private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
     branch: master
 
@@ -78,27 +86,27 @@ resources:
   type: azure-blobstore
   source:
     regexp: .*tasks-(.*).zip
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: platform-automation-image
   type: azure-blobstore
   source:
     regexp: .*image-(.*).tgz
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 # INSTALLATION BACKUP FILES
 - name: installation
   type: azure-blobstore
   source:
     regexp: installation-after-(.*).zip
-    <<: *storage-params
+    <<: *install-storage-params
 
 # OPSMAN IMAGE
 - name: opsman-image
   type: azure-blobstore
   source:
     regexp: ((products.opsman.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Operations Manager Install Workflow                      │

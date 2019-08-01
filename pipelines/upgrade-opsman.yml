@@ -2,17 +2,25 @@
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Reusable anchors                                                  │
 #│                                                                   │
-#├ storage-params:                                                   │
-#│ └── Params for Azure Storage                                      │
+#├ deploy-storage-params:                                            │
+#│ └── Params for Azure Storage for products to deploy               │
+#├ install-storage-params:                                           │
+#│ └── Params for Azure Storage for installation*.zip location       │
 #├ credhub-interpolate                                               │
 #│ └── Common configuration file interpolation                       │
 #└───────────────────────────────────────────────────────────────────┘
 
-storage-params: &storage-params
-  storage_account_name: ((azure_blob.username))
-  storage_account_key: ((azure_blob.password))
-  container: ((azure_blob_container))
-  base_url: ((azure_blob_url))
+deploy-storage-params: &deploy-storage-params
+  storage_account_name: ((azure_storage_accounts.deploy.username))
+  storage_account_key: ((azure_storage_accounts.deploy.password))
+  container: product
+  base_url: ((azure_storage_accounts.base_url))
+
+install-storage-params: &install-storage-params
+  storage_account_name: ((azure_storage_accounts.state.username))
+  storage_account_key: ((azure_storage_accounts.state.password))
+  container: opsmgr
+  base_url: ((azure_storage_accounts.base_url))
 
 credhub-interpolate: &credhub-interpolate
   image: platform-automation-image
@@ -70,7 +78,7 @@ resources:
 - name: platform-automation-pipelines
   type: git
   source:
-    private_key: ((git.user.private_key))
+    private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
     branch: master
 
@@ -79,41 +87,44 @@ resources:
   type: azure-blobstore
   source:
     regexp: .*tasks-(.*).zip
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: platform-automation-image
   type: azure-blobstore
   source:
     regexp: .*image-(.*).tgz
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 # INSTALLATION BACKUP FILES
 - name: installation-before
   type: azure-blobstore
   source:
     regexp: installation-before-(.*).zip
-    <<: *storage-params
+    <<: *install-storage-params
 
 - name: installation-after
   type: azure-blobstore
   source:
     regexp: installation-after-(.*).zip
-    <<: *storage-params
+    <<: *install-storage-params
 
 # OPSMAN IMAGE
 - name: opsman-image
   type: azure-blobstore
   source:
     regexp: ((products.opsman.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Operations Manager Install Workflow                      │
 #│                                                                   │
-#├ Create OpsMan VM and Configuration Authentication                 │
+#├ Export the Before Installation                                    │
 #│ ├── Generate (interpolate) environment files                      │
-#│ ├── Create the VM and save state.yml to Azure Blobstore           │
-#│ └── Configure the initial authentication mode for OpsMan          │
+#│ └── Export the installation file, store in Azure Blobstore        │
+#│                                                                   │
+#├ Upgrade OpsMan VM and Save the state.yml                          │
+#│ ├── Generate (interpolate) environment files                      │
+#│ └── Upgrade the VM and save state.yml to Azure Blobstore          │
 #│                                                                   │
 #├ Configure the BOSH Director                                       │
 #│ ├── Generate (interpolate) environment files                      │
@@ -123,7 +134,7 @@ resources:
 #│ ├── Generate (interpolate) environment files                      │
 #│ └── Apply changes for director deploying bosh                     │
 #│                                                                   │
-#├ Export the Installation                                           │
+#├ Export the Installation After upgrade                             │
 #│ ├── Generate (interpolate) environment files                      │
 #│ └── Export the installation file, store in Azure Blobstore        │
 #└───────────────────────────────────────────────────────────────────┘

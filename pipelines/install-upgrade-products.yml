@@ -50,28 +50,35 @@ groups:
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Reusable anchors                                                  │
 #│                                                                   │
-#├ storage-params:                                                   │
-#│ └── Params for Azure Storage                                      │
+#├ deploy-storage-params:                                            │
+#│ └── Params for Azure Storage for products to deploy               │
+#├ install-storage-params:                                           │
+#│ └── Params for Azure Storage for installation*.zip location       │
 #├ credhub-interpolate                                               │
 #│ └── Common configuration file interpolation                       │
 #└───────────────────────────────────────────────────────────────────┘
 
-storage-params: &storage-params
-  storage_account_name: ((azure_blob.username))
-  storage_account_key: ((azure_blob.password))
-  container: ((azure_blob_container))
-  base_url: ((azure_blob_url))
+deploy-storage-params: &deploy-storage-params
+  storage_account_name: ((azure_storage_accounts.deploy.username))
+  storage_account_key: ((azure_storage_accounts.deploy.password))
+  container: product
+  base_url: ((azure_storage_accounts.base_url))
+
+install-storage-params: &install-storage-params
+  storage_account_name: ((azure_storage_accounts.state.username))
+  storage_account_key: ((azure_storage_accounts.state.password))
+  container: opsmgr
+  base_url: ((azure_storage_accounts.base_url))
 
 credhub-interpolate: &credhub-interpolate
   file: platform-automation-tasks/tasks/credhub-interpolate.yml
   params:
-    CREDHUB_CA_CERT: ((credhub_ca_cert))
-    CREDHUB_CLIENT: ((credhub_username))
-    CREDHUB_SECRET: ((credhub_password))
-    CREDHUB_SERVER: ((credhub_endpoint))
-    INTERPOLATION_PATHS: foundation/((foundation))/config foundation/((foundation))/env
-      foundation/((foundation))/vars
-    PREFIX: /concourse/sbx
+    CREDHUB_SERVER: ((credhub.server))
+    CREDHUB_CA_CERT: ((credhub.ca_cert))
+    CREDHUB_CLIENT: ((credhub.client))
+    CREDHUB_SECRET: ((credhub.secret))
+    PREFIX: /concourse/((foundation))
+    INTERPOLATION_PATHS: ((credhub.interpolate_folders))
   input_mapping:
     files: platform-automation-pipelines
   image: platform-automation-image
@@ -134,72 +141,72 @@ resources:
   type: azure-blobstore
   source:
     regexp: .*tasks-(.*).zip
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: platform-automation-image
   type: azure-blobstore
   source:
     regexp: .*image-(.*).tgz
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 # INSTALLATION BACKUP FILES
 - name: installation
   type: azure-blobstore
   source:
     regexp: installation-(.*).zip
-    <<: *storage-params
+    <<: *install-storage-params
 
 # PAS
 - name: pas-product
   type: azure-blobstore
   source:
     regexp: ((products.pas.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: pas-stemcell
   type: azure-blobstore
   source:
     regexp: ((products.pas.stemcell-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 # CREDHUB SERVICE BROKER
 - name: credhubsb-product
   type: azure-blobstore
   source:
     regexp: ((products.credhubsb.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: credhubsb-stemcell
   type: azure-blobstore
   source:
     regexp: ((products.credhubsb.stemcell-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 # MYSQL
 - name: mysql-product
   type: azure-blobstore
   source:
     regexp: ((products.mysql.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: mysql-stemcell
   type: azure-blobstore
   source:
     regexp: ((products.mysql.stemcell-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 # LOG ANALYTICS NOZZLE
 - name: lanozzle-product
   type: azure-blobstore
   source:
     regexp: ((products.lanozzle.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: lanozzle-stemcell
   type: azure-blobstore
   source:
     regexp: ((products.lanozzle.stemcell-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Product Installation Workflow                            │
@@ -271,7 +278,7 @@ jobs:
   - task: upload-product
     file: platform-automation-tasks/tasks/upload-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: pas-product
@@ -280,7 +287,7 @@ jobs:
   - task: stage-product
     file: platform-automation-tasks/tasks/stage-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: pas-product
@@ -289,7 +296,7 @@ jobs:
   - task: upload-stemcell
     file: platform-automation-tasks/tasks/upload-stemcell.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       stemcell: pas-stemcell
@@ -315,9 +322,9 @@ jobs:
   - task: configure-product
     file: platform-automation-tasks/tasks/configure-product.yml
     params:
-      CONFIG_FILE: foundation/sbx/products/elastic-runtime.yml
-      ENV_FILE: foundation/sbx/env/env.yml
-      VARS_FILES: vars/foundation/sbx/vars/elastic-runtime-vars.yml
+      CONFIG_FILE: foundation/((foundation))/products/elastic-runtime.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/elastic-runtime-vars.yml
     input_mapping:
       config: platform-automation-pipelines
       env: interpolated-files
@@ -347,7 +354,7 @@ jobs:
   - task: upload-product
     file: platform-automation-tasks/tasks/upload-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: credhubsb-product
@@ -356,7 +363,7 @@ jobs:
   - task: stage-product
     file: platform-automation-tasks/tasks/stage-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: credhubsb-product
@@ -365,7 +372,7 @@ jobs:
   - task: upload-stemcell
     file: platform-automation-tasks/tasks/upload-stemcell.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       stemcell: credhubsb-stemcell
@@ -391,9 +398,9 @@ jobs:
   - task: configure-product
     file: platform-automation-tasks/tasks/configure-product.yml
     params:
-      CONFIG_FILE: foundation/sbx/products/credhub-service-broker.yml
-      ENV_FILE: foundation/sbx/env/env.yml
-      VARS_FILES: vars/foundation/sbx/vars/credhub-service-broker-vars.yml
+      CONFIG_FILE: foundation/((foundation))/products/credhub-service-broker.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/credhub-service-broker-vars.yml
     input_mapping:
       config: platform-automation-pipelines
       env: interpolated-files
@@ -423,7 +430,7 @@ jobs:
   - task: upload-product
     file: platform-automation-tasks/tasks/upload-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: mysql-product
@@ -432,7 +439,7 @@ jobs:
   - task: stage-product
     file: platform-automation-tasks/tasks/stage-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: mysql-product
@@ -441,7 +448,7 @@ jobs:
   - task: upload-stemcell
     file: platform-automation-tasks/tasks/upload-stemcell.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       stemcell: mysql-stemcell
@@ -468,9 +475,9 @@ jobs:
   - task: configure-product
     file: platform-automation-tasks/tasks/configure-product.yml
     params:
-      CONFIG_FILE: foundation/sbx/products/pivotal-mysql.yml
-      ENV_FILE: foundation/sbx/env/env.yml
-      VARS_FILES: vars/foundation/sbx/vars/pivotal-mysql-vars.yml
+      CONFIG_FILE: foundation/((foundation))/products/pivotal-mysql.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/pivotal-mysql-vars.yml
     input_mapping:
       config: platform-automation-pipelines
       env: interpolated-files
@@ -498,7 +505,7 @@ jobs:
   - task: upload-product
     file: platform-automation-tasks/tasks/upload-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: lanozzle-product
@@ -507,7 +514,7 @@ jobs:
   - task: stage-product
     file: platform-automation-tasks/tasks/stage-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: lanozzle-product
@@ -516,7 +523,7 @@ jobs:
   - task: upload-stemcell
     file: platform-automation-tasks/tasks/upload-stemcell.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       stemcell: lanozzle-stemcell
@@ -543,9 +550,9 @@ jobs:
   - task: configure-product
     file: platform-automation-tasks/tasks/configure-product.yml
     params:
-      CONFIG_FILE: foundation/sbx/products/azure-log-analytics-nozzle.yml
-      ENV_FILE: foundation/sbx/env/env.yml
-      VARS_FILES: vars/foundation/sbx/vars/azure-log-analytics-nozzle-vars.yml
+      CONFIG_FILE: foundation/((foundation))/products/azure-log-analytics-nozzle.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/azure-log-analytics-nozzle-vars.yml
     input_mapping:
       config: platform-automation-pipelines
       env: interpolated-files
@@ -574,7 +581,7 @@ jobs:
   - task: apply-product-changes
     file: platform-automation-tasks/tasks/apply-changes.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
     image: platform-automation-image
@@ -601,7 +608,7 @@ jobs:
   - task: export-installation
     file: platform-automation-tasks/tasks/export-installation.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
     image: platform-automation-image

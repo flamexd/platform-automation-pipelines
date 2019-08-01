@@ -1,10 +1,10 @@
 iaas:
   additional_cloud_properties: {}
-  bosh_storage_account_name: ((bosh_storage_account))
+  bosh_storage_account_name: ((azure-opsman-storage-account.username))
   client_id: ((azure_client.username))
   client_secret: ((azure_client.password))
   cloud_storage_type: standard
-  default_security_group: sandbox2-bosh-deployed-vms-security-group
+  default_security_group: sbx-2-bosh-deployed-vms-security-group
   environment: AzureUSGovernment
   resource_group_name: ((azure_resource_group))
   ssh_public_key: ((git_user.public_key))
