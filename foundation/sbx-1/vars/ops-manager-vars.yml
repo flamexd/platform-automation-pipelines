@@ -1,0 +1,41 @@
+---
+# vars file for product: OpsMan
+
+# Notes:
+# 1. This should work together with "/products/ops-manager.yml" to parameterize the product config
+# 2. The values of the YAML elements are values stored in CredHub
+
+azure:
+  subscription_id: ((azure_subscription))
+  resource_group: ((azure_resource_group))
+  tenant_id: ((azure_tenant_id))
+  client_id: ((azure_client.username))
+  client_secret: ((azure_client.password))
+  location: ((azure_location))
+  network_security_group: sbx-1-ops-manager-security-group
+  vpc_subnet: /subscriptions/((azure_subscription))/resourceGroups/((azure_resource_group))/providers/Microsoft.Network/virtualNetworks/((azure_resource_group))-virtual-network/subnets/((azure_resource_group))-infrastructure-subnet
+
+  # At least one IP address (public or private)
+  # needs to be assigned to the VM.
+  # It is also permissable to assign both.
+
+  public_ip: ((om_external_ip))  # 52.227.152.229
+  # private_ip: 10.0.8.4
+
+  # blobstore where opsman image (yml) can be found
+  storage_account: ((azure-deploy-storage-account.username))
+  storage_key:     ((azure-deploy-storage-account.password))
+  container:       product
+  # storage_account: ((azure_opsman_blob.username))                      # account name of container
+  # storage_key: ((azure_opsman_blob.password))
+  # container: ((azure_opsman_container))                    # container for opsman image
+
+  ssh_public_key: ((git_user.public_key))
+  vm_name: ops-manager-vm-3                     # default: Ops Manager-vm
+  boot_disk_size: 100                           # default: 200
+  cloud_name: AzureUSGovernment                 # default: AzureCloud
+
+  # This flag is only respected by the create-vm & upgrade-opsman commands
+  # set to true if you want to create the new opsman vm with unmanaged disk
+  # delete-vm discovers the disk type from the VM
+  use_unmanaged_disk: false

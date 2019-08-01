@@ -1,0 +1,55 @@
+---
+# SECRET VARS
+global_recipient_email: ((pcf_admin_email))
+network_name: ((pas_network_name))
+plan1_selector/single_node/az_multi_select: [((azure_availability_sets))]
+plan2_selector/single_node/az_multi_select: [((azure_availability_sets))]
+plan3_selector/single_node/az_multi_select: [((azure_availability_sets))]
+service_network_name: ((service_network_name))
+singleton_availability_zone: ((azure_availability_sets))
+backup_account_name: ((azure-deploy-storage-account.username))
+backup_container_name: mysql-backup
+backup_blobstore_url: https://((azure-deploy-storage-account.username)).blob.((azure_blob_url))
+azure_storage_access_key_secret: ((azure-deploy-storage-account.password))
+
+# ERRAND VARS
+delete-all-service-instances-and-deregister-broker_pre_delete_state: default
+register-broker_post_deploy_state: default
+smoke-tests_post_deploy_state: default
+upgrade-all-service-instances_post_deploy_state: default
+validate-before-upgrade-instances_post_deploy_state: default
+
+# PRODUCT DEFAULT VARS
+allow_lower_case_table_names_via_config_param: false
+audit_logging_enabled: false
+canary_instances: 0
+deprecated_bindings_string: X
+enable_lower_case_table_names: false
+enable_read_only_admin: false
+enable_secure_binding_credentials: false
+global_service_instance_limit: 50
+local_infile: false
+mysql_metrics_frequency: 30
+plan1_selector/single_node/access_dropdown: enable
+plan1_selector/single_node/description: This plan provides a small dedicated MySQL instance.
+plan1_selector/single_node/instance_limit: 10
+plan1_selector/single_node/name: db-small
+plan1_selector/single_node/paid_plan: false
+plan2_selector/single_node/access_dropdown: disable
+plan2_selector/single_node/description: This plan provides a medium dedicated MySQL instance.
+plan2_selector/single_node/instance_limit: 10
+plan2_selector/single_node/name: db-medium
+plan2_selector/single_node/paid_plan: false
+plan3_selector/single_node/access_dropdown: disable
+plan3_selector/single_node/description: This plan provides a large dedicated MySQL instance.
+plan3_selector/single_node/instance_limit: 10
+plan3_selector/single_node/name: db-large
+plan3_selector/single_node/paid_plan: false
+request_timeout: 120
+simultaneous_upgrades: 1
+userstat: false
+wait_timeout: 28800
+
+# RESOURCE CONFIG VARS
+dedicated-mysql-broker_instance_type: automatic
+dedicated-mysql-broker_instances: automatic
