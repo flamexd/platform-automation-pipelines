@@ -46,18 +46,18 @@ resource_types:
   type: docker-image
   source:
     username: admin
-    password: ((harbor_password))
+    password: ((registry_password))
     client_certs:
-    - domain: ((harbor_uri))
+    - domain: ((registry_uri))
       cert: |
         ((control-plane-ssl-cert))
       key: |
         ((control-plane-ssl-key))
     ca_certs:
-    - domain: ((harbor_uri))
+    - domain: ((registry_uri))
       cert: |
         ((control-plane-ca-cert))
-    repository: ((harbor_uri))/azure/azure-blobstore-resource
+    repository: ((registry_uri))/azure/azure-blobstore-resource
     tag: latest
 
 #┌───────────────────────────────────────────────────────────────────┐
