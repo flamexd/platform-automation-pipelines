@@ -1,0 +1,32 @@
+---
+product-name: p-compliance-scanner
+product-properties:
+  .properties.ntp_server:
+    value: ((ntp_server))
+  .properties.scan_report_formats:
+    value:
+    - log
+    - xml
+    - html
+  .properties.scanner_timeout:
+    value: 1200
+  .properties.syslog_host:
+    value: 192.0.2.1
+  .properties.syslog_port:
+    value: 514
+network-properties:
+  network:
+    name: services
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
+resource-config:
+  oscap_store:
+    instances: automatic
+    instance_type:
+      id: automatic
+    internet_connected: false
+errand-config:
+  scan_results:
+    post-deploy-state: false

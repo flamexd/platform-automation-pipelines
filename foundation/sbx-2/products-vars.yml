@@ -30,6 +30,12 @@ products:
     product-regex: azure-log-analytics-nozzle-(1.4.*).pivotal
     stemcell-regex: bosh-stemcell-(315.*)-azure-(.*).tgz
 
+  # Compliance Scanner
+  pcs:
+    product-version: 1.0.0
+    product-regex: p-compliance-scanner-(1.0.*).pivotal
+    stemcell-regex: bosh-stemcell-(315.*)-azure-(.*).tgz
+
   # # Redis
   # redis:
   #   product-version: 2.0.1

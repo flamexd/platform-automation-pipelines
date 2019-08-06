@@ -34,10 +34,6 @@ groups:
   jobs:
   - upload-stage-product-pas
   - configure-product-pas
-- name: Compliance Scanner
-  jobs:
-  - upload-stage-product-pcs
-  - configure-product-pcs
 - name: Credhub-SB
   jobs:
   - upload-stage-product-csb
@@ -50,6 +46,10 @@ groups:
   jobs:
   - upload-stage-product-lanozzle
   - configure-product-lanozzle
+- name: Compliance Scanner
+  jobs:
+  - upload-stage-product-pcs
+  - configure-product-pcs
 - name: Apply-Changes
   jobs:
   - apply-product-changes
@@ -223,13 +223,13 @@ resources:
   type: azure-blobstore
   source:
     regexp: ((products.pcs.product-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 - name: pcs-stemcell
   type: azure-blobstore
   source:
     regexp: ((products.pcs.stemcell-regex))
-    <<: *storage-params
+    <<: *deploy-storage-params
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Product Installation Workflow                            │
@@ -609,6 +609,8 @@ jobs:
       params:
         unpack: true
     - get: platform-automation-pipelines
+      passed: [ configure-product-lanozzle ]
+      trigger: true
 
   - task: credhub-interpolate
     <<: *credhub-interpolate
@@ -616,7 +618,7 @@ jobs:
   - task: upload-product
     file: platform-automation-tasks/tasks/upload-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: pcs-product
@@ -625,7 +627,7 @@ jobs:
   - task: stage-product
     file: platform-automation-tasks/tasks/stage-product.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       product: pcs-product
@@ -634,7 +636,7 @@ jobs:
   - task: upload-stemcell
     file: platform-automation-tasks/tasks/upload-stemcell.yml
     params:
-      ENV_FILE: foundation/sbx/env/env.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
     input_mapping:
       env: interpolated-files
       stemcell: pcs-stemcell
@@ -661,9 +663,9 @@ jobs:
   - task: configure-product
     file: platform-automation-tasks/tasks/configure-product.yml
     params:
-      CONFIG_FILE: foundation/sbx/products/pivotal-pcs.yml
-      ENV_FILE: foundation/sbx/env/env.yml
-      VARS_FILES: vars/foundation/sbx/vars/pivotal-pcs-vars.yml
+      CONFIG_FILE: foundation/((foundation))/products/pivotal-pcs.yml
+      ENV_FILE: foundation/((foundation))/env/env.yml
+      VARS_FILES: vars/foundation/((foundation))/vars/pivotal-pcs-vars.yml
     input_mapping:
       config: platform-automation-pipelines
       env: interpolated-files
@@ -683,7 +685,7 @@ jobs:
       params:
         unpack: true
     - get: platform-automation-pipelines
-      passed: [ configure-product-lanozzle ]
+      passed: [ configure-product-pcs ]
       trigger: true
 
   - task: credhub-interpolate
