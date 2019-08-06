@@ -12,3 +12,4 @@ iaas:
   storage_account_type: Standard_LRS
   subscription_id: ((azure_subscription))
   tenant_id: ((azure_tenant_id))
+  trusted_certs: ((wildcard_cert.ca))

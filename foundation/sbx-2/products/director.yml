@@ -65,6 +65,7 @@ properties-configuration:
     handlers: []
   security_configuration:
     opsmanager_root_ca_trusted_certs: true
+    trusted_certificates: ((iaas.trusted_certs))
   syslog_configuration:
     enabled: false
 network-assignment:

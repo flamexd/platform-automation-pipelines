@@ -379,8 +379,8 @@ jobs:
       params:
         unpack: true
     - get: platform-automation-pipelines
-      # passed: [ configure-product-pas ]
-      # trigger: true
+      passed: [ configure-product-pas ]
+      trigger: true
 
   - task: credhub-interpolate
     <<: *credhub-interpolate
@@ -455,8 +455,8 @@ jobs:
       params:
         unpack: true
     - get: platform-automation-pipelines
-      # passed: [ configure-product-csb ]
-      # trigger: true
+      passed: [ configure-product-csb ]
+      trigger: true
 
   - task: credhub-interpolate
     <<: *credhub-interpolate
@@ -532,6 +532,8 @@ jobs:
       params:
         unpack: true
     - get: platform-automation-pipelines
+      passed: [ configure-product-mysql ]
+      trigger: true
 
   - task: credhub-interpolate
     <<: *credhub-interpolate
@@ -681,8 +683,8 @@ jobs:
       params:
         unpack: true
     - get: platform-automation-pipelines
-      # passed: [ configure-product-mysql ]
-      # trigger: true
+      passed: [ configure-product-lanozzle ]
+      trigger: true
 
   - task: credhub-interpolate
     <<: *credhub-interpolate

@@ -16,10 +16,9 @@ deploy-storage-params: &deploy-storage-params
   container: product
   base_url: ((azure_storage_accounts.base_url))
 
-install-storage-params: &install-storage-params
+state-storage-params: &state-storage-params
   storage_account_name: ((azure_storage_accounts.state.username))
   storage_account_key: ((azure_storage_accounts.state.password))
-  container: opsmgr
   base_url: ((azure_storage_accounts.base_url))
 
 credhub-interpolate: &credhub-interpolate
@@ -80,7 +79,7 @@ resources:
   source:
     private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
-    branch: master
+    branch: ((git.configuration.branch))
 
 # PLATFORM AUTOMATION
 - name: platform-automation-tasks
@@ -100,13 +99,22 @@ resources:
   type: azure-blobstore
   source:
     regexp: installation-before-(.*).zip
-    <<: *install-storage-params
+    container: opsmgr
+    <<: *state-storage-params
 
 - name: installation-after
   type: azure-blobstore
   source:
     regexp: installation-after-(.*).zip
-    <<: *install-storage-params
+    container: opsmgr
+    <<: *state-storage-params
+
+- name: state-file
+  type: azure-blobstore
+  source:
+    regexp: st(.*).yml
+    container: p-automator
+    <<: *state-storage-params
 
 # OPSMAN IMAGE
 - name: opsman-image
@@ -182,6 +190,7 @@ jobs:
       params: { unpack: true }
     - get: installation-before
     - get: platform-automation-pipelines
+    - get: state-file
 
   - task: credhub-interpolate
     <<: *credhub-interpolate
@@ -191,7 +200,7 @@ jobs:
     file: platform-automation-tasks/tasks/upgrade-opsman.yml
     input_mapping:
       image: opsman-image
-      state: platform-automation-pipelines
+      state: state-file
       config: platform-automation-pipelines
       env: interpolated-files
       vars: interpolated-files
@@ -200,28 +209,13 @@ jobs:
       OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
       VARS_FILES: vars/foundation/((foundation))/vars/ops-manager-vars.yml
       ENV_FILE: foundation/((foundation))/env/env.yml
-      STATE_FILE: foundation/((foundation))/state/state.yml
+      STATE_FILE: state.yml
       INSTALLATION_FILE: installation-before-ops-manager-upgrade.zip
     on_success:
       do:
-        - task: make-commit-state
-          image: platform-automation-image
-          file: platform-automation-tasks/tasks/make-git-commit.yml
-          input_mapping:
-            repository: platform-automation-pipelines
-            file-source: generated-state
-          output_mapping:
-            repository-commit: configuration-commit-state
+        - put: state-file
           params:
-            FILE_SOURCE_PATH: state.yml
-            FILE_DESTINATION_PATH: foundation/((foundation))/state/state.yml
-            GIT_AUTHOR_EMAIL: ((git.user.email))
-            GIT_AUTHOR_NAME: ((git.user.username))
-            COMMIT_MESSAGE: "Update state file after ops-manager upgrade"
-        - put: platform-automation-pipelines
-          params:
-            repository: configuration-commit-state
-            merge: true
+            file: generated-state/state.yml
 
 # CONFIGURE the BOSH DIRECTOR
 - name: configure-director
