@@ -11,7 +11,7 @@ azure:
   tenant_id: ((azure_tenant_id))
   client_id: ((azure_client.username))
   client_secret: ((azure_client.password))
-  location: ((azure_location))
+  location: usgovvirginia
   network_security_group: sbx-2-ops-manager-security-group
   vpc_subnet: /subscriptions/((azure_subscription))/resourceGroups/((azure_resource_group))/providers/Microsoft.Network/virtualNetworks/((azure_resource_group))-virtual-network/subnets/((azure_resource_group))-infrastructure-subnet
 

@@ -9,7 +9,7 @@ service_network_name: ((service_network_name))
 singleton_availability_zone: ((azure_availability_sets))
 backup_account_name: ((azure-deploy-storage-account.username))
 backup_container_name: mysql-backup
-backup_blobstore_url: https://((azure-deploy-storage-account.username)).blob.((azure_blob_url))
+backup_blobstore_url: https://((azure-deploy-storage-account.username)).blob.core.usgovcloudapi.net
 azure_storage_access_key_secret: ((azure-deploy-storage-account.password))
 
 # ERRAND VARS

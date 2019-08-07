@@ -1,7 +1,0 @@
-- op: add
-  path: /resources/type=azure-blobstore/source
-  value:
-    storage_account_name: ((azure_blob.username))
-    storage_account_key: ((azure_blob.password))
-    container: ((azure_blob_container))
-    base_url: ((azure_blob_url))
