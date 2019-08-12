@@ -1,0 +1,28 @@
+---
+platform: linux
+
+params:
+  AZURE_CLOUD_TYPE:
+  SUBSCRIPTION_ID:
+  TENANT_ID:
+  CLIENT_SECRET: 
+  RESOURCE_GROUP:
+  LOCATION:
+  # - ^AZURE-CLI* variables
+
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    # WIP: add code to create storage account
+    # set cloud (fixme: tj/conzetti)
+    # needs to be updated (remove comment after)
+    export AZURE_STORAGE_ACCOUNT="${openssl rand -base64 500 | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1}"
+    export AZURE_STORAGE_KEY=""
+    az login --service-principal -u "${SUBSCRIPTION_ID"} -p "${CLIENT_SECRET}" --tenant "${TENANT_ID}"
+    az cloud set
+    az group create -n "${RESOURCE_GROUP}" -l "${LOCATION}"
+    az storage account create -n "${AZURE_STORAGE_ACCOUNT}" -g "${RESOURCE_GROUP}" -l "${LOCATION}"
+    az storage container create -n terraform

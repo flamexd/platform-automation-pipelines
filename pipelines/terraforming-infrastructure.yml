@@ -156,17 +156,22 @@ resources:
 #├ Initiate a terraform destroy to remove the environment            │
 #└───────────────────────────────────────────────────────────────────┘
 jobs:
-- name: create-terraform-container
+- name: create-terraform-storage
   plan:
   - get: platform-automation-image
     params:
       unpack: true
 
-  - task: create-terraform-container
+  - task: create-terraform-storage
     image: platform-automation-image
-    file: platform-automation-pipelines/tasks/create-terraform-container.yml
+    file: platform-automation-pipelines/tasks/create-terraform-storage.yml
     params:
       AZURE_CLOUD_TYPE: AzureUSGovernment
+      SUBSCRIPTION_ID: ((azure.subscription_id))
+      TENANT_ID: ((azure.tenant_id))
+      CLIENT_SECRET: ((azure.client.password))))
+      LOCATION: usgovvirginia
+      RESOURCE_GROUP: ((foundation))
 
 - name: terraform-plan
   plan:
