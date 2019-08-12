@@ -1,5 +1,10 @@
 ---
-foundation: sbx-1
+foundation: sbx-4
+location: usgovvirginia
+dns_suffix: logux.net
+terraform_source: terraform-repo/cie/terraforming-pas
+# FIXME (@conzetti): find a better convention for this git repo
+terraform_repo: git@ssh.dev.azure.com:v3/log-ux/prometheus/bespin-dojo
 
 azure_storage_accounts:
   state:  # All state files (terraform [tfstate], p-automator [state.yml], opsmgr [installation.zip])

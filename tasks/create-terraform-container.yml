@@ -1,0 +1,22 @@
+---
+platform: linux
+
+params:
+  AZURE_CLOUD_TYPE:
+  # - ^AZURE-CLI* variables
+
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    # WIP: add code to create storage account
+    # set cloud (fixme: tj/conzetti)
+    # needs to be updated (remove comment after)
+    export AZURE_STORAGE_ACCOUNT=""
+    export AZURE_STORAGE_KEY=""
+    az login
+    az cloud set
+    az storage account create <>
+    az storage container create <>

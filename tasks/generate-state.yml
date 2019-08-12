@@ -1,0 +1,18 @@
+---
+platform: linux
+
+outputs:
+- name: state
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    main() {
+      set +x
+        echo "{"iaas": "azure", "vm_id": ""}" > state/state.yml"
+      set -x
+    }
+
+    main "$@"
