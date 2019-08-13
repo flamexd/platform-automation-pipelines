@@ -31,15 +31,19 @@ run:
       local client_secret="${2}"
       local tenant_id="${3}"
       local cloud_type="${4}"
+      local subscription_id="${5}"
 
+      az cloud set \
+        --name "${cloud_type}"
+
+      az account set \
+        --subscription "${subscription_id}"
+      
       az login \
         --service-principal \
         --username "${client_id}" \
         --password "${client_secret}" \
         --tenant "${tenant_id}"
-
-      az cloud set \
-        --name "${cloud_type}"
     }
 
     function create_resource_group() {
@@ -57,12 +61,12 @@ run:
       local account_prefix="terraform"
       local account_fullname="${account_prefix}-${account_suffix}"
       local storage_account="terraform_azure_blob"
-      local storage_account_key="$(az storage account keys list --name ${storage_account} --query "[].value | [0]")"
+      local storage_account_key="$(az storage account keys list --account-name ${storage_account} --query "[].value | [0]")"
 
       credhub generate \
         --type user \
         --name "${credhub_prefix}/${storage_account}" \
-        --username "${account_fullname}"
+        --username "${account_fullname}" \
         --password "${storage_account_key}"
     }
 
@@ -78,13 +82,13 @@ run:
         --location "${location}"
 
       az storage container create \
-        --name "${container}"
+        --name "${container}" \
         --account-key ${storage_account_key} \
         --account-name ${account_fullname}
     }
 
     if [[ "${FOUNDATION}" =~ "sbx" ]] ; then
-      login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}"
+      login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
       generate_storage_credentials "${PREFIX}"
