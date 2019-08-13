@@ -74,9 +74,10 @@ run:
       local account_suffix="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
       local account_prefix="terraform"
       local account_fullname="${account_prefix}${account_suffix}"
+      local storage_account="terraform_azure_blob"
+      local storage_account_key="$(az storage account keys list --account-name ${account_fullname} --query "[].value | [0]")"
       local resource_group="${1}"
       local location="${2}"
-      local container="terraform"
 
       az storage account create \
         --name "${account_fullname}" \
@@ -84,7 +85,7 @@ run:
         --location "${location}"
 
       az storage container create \
-        --name "${container}" \
+        --name "${account_prefix}" \
         --account-key ${storage_account_key} \
         --account-name ${account_fullname}
     }
@@ -93,8 +94,8 @@ run:
       login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
-      generate_storage_credentials "${PREFIX}"
+      # generate_storage_credentials "${PREFIX}"
     else
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
-      generate_storage_credentials "${PREFIX}"
+      # generate_storage_credentials "${PREFIX}"
     fi
