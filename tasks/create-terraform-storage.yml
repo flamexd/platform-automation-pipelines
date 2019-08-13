@@ -26,7 +26,7 @@ run:
   args:
   - "-c"
   - |
-    function login() {
+    function az_login() {
       local client_id="${1}"
       local client_secret="${2}"
       local tenant_id="${3}"
@@ -38,7 +38,7 @@ run:
 
       az account set \
         --subscription "${subscription_id}"
-      
+
       az login \
         --service-principal \
         --username "${client_id}" \
@@ -55,47 +55,52 @@ run:
         --location "${location}"
     }
 
-    function generate_storage_credentials() {
+    function set_storage_credentials() {
       local credhub_prefix="${1}"
-      local account_suffix="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
-      local account_prefix="terraform"
-      local account_fullname="${account_prefix}${account_suffix}"
+      local storage_fullname="${2}"
+      local storage_password="${3}"
       local storage_account="terraform_azure_blob"
-      local storage_account_key="$(az storage account keys list --account-name ${account_fullname} --query "[].value | [0]")"
 
-      credhub generate \
+      credhub set \
         --type user \
         --name "${credhub_prefix}/${storage_account}" \
-        --username "${account_fullname}" \
+        --username "${storage_fullname}" \
         --password "${storage_account_key}"
     }
 
     function create_storage_account() {
-      local account_suffix="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
-      local account_prefix="terraform"
-      local account_fullname="${account_prefix}${account_suffix}"
-      local storage_account="terraform_azure_blob"
-      local storage_account_key="$(az storage account keys list --account-name ${account_fullname} --query "[].value | [0]")"
       local resource_group="${1}"
       local location="${2}"
+      local storage_fullname="${3}"
 
       az storage account create \
-        --name "${account_fullname}" \
+        --name "${storage_fullname}" \
         --resource-group "${resource_group}" \
         --location "${location}"
+    }
+
+    function create_storage_container() {
+      local storage_container="terraform"
+      local storage_account_key="${1}"
+      local storage_fullname="${2}"
 
       az storage container create \
-        --name "${account_prefix}" \
+        --name "${storage_container}" \
         --account-key ${storage_account_key} \
-        --account-name ${account_fullname}
     }
 
     if [[ "${FOUNDATION}" =~ "sbx" ]] ; then
-      login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
+      STORAGE_SUFFIX="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
+      STORAGE_PREFIX="terraform"
+      STORAGE_FULLNAME="${STORAGE_PREFIX}${STORAGE_SUFFIX}"
+      az_login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
-      create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
-      # generate_storage_credentials "${PREFIX}"
+      create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}" "${STORAGE_FULLNAME}"
+      STORAGE_PASSWORD="$(az storage account keys list --account-name "${STORAGE_FULLNAME}" --query "[].value | [0]")"
+      create_storage_container "${STORAGE_PASSWORD}" "${STORAGE_FULLNAME}"
+      set_storage_credentials "${PREFIX}" "${STORAGE_FULLNAME}" "${STORAGE_PASSWORD}"
     else
-      create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
-      # generate_storage_credentials "${PREFIX}"
+      create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}" "${STORAGE_FULLNAME}"
+      create_storage_container "${STORAGE_PASSWORD}" "${STORAGE_FULLNAME}"
+      set_storage_credentials "${PREFIX}" "${STORAGE_FULLNAME}" "${STORAGE_PASSWORD}"
     fi
