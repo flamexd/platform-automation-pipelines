@@ -57,11 +57,11 @@ run:
 
     function generate_storage_credentials() {
       local credhub_prefix="${1}"
-      local account_suffix="$(openssl rand -base64 500 | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1)"
+      local account_suffix="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
       local account_prefix="terraform"
-      local account_fullname="${account_prefix}-${account_suffix}"
+      local account_fullname="${account_prefix}${account_suffix}"
       local storage_account="terraform_azure_blob"
-      local storage_account_key="$(az storage account keys list --account-name ${storage_account} --query "[].value | [0]")"
+      local storage_account_key="$(az storage account keys list --account-name ${account_fullname} --query "[].value | [0]")"
 
       credhub generate \
         --type user \
@@ -71,13 +71,15 @@ run:
     }
 
     function create_storage_account() {
-      local storage_account="terraform_azure_blob"
+      local account_suffix="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
+      local account_prefix="terraform"
+      local account_fullname="${account_prefix}${account_suffix}"
       local resource_group="${1}"
       local location="${2}"
       local container="terraform"
 
       az storage account create \
-        --name "${storage_account}" \
+        --name "${account_fullname}" \
         --resource-group "${resource_group}" \
         --location "${location}"
 
