@@ -96,7 +96,7 @@ run:
       az_login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}" "${STORAGE_FULLNAME}"
-      STORAGE_PASSWORD="$(az storage account keys list --account-name "${STORAGE_FULLNAME}" --query "[].value | [0]")"
+      STORAGE_PASSWORD="$(az storage account keys list --account-name ${STORAGE_FULLNAME} --query \"[].value | [0]\")"
       create_storage_container "${STORAGE_PASSWORD}" "${STORAGE_FULLNAME}"
       set_storage_credentials "${PREFIX}" "${STORAGE_FULLNAME}" "${STORAGE_PASSWORD}"
     else
