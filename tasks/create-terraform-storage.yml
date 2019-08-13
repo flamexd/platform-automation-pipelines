@@ -86,17 +86,17 @@ run:
 
       az storage container create \
         --name "${storage_container}" \
-        --account-key ${storage_account_key} \
+        --account-key ${storage_account_key}
     }
 
-    if [[ "${FOUNDATION}" =~ "sbx" ]] ; then
+    if [[ "${FOUNDATION}" =~ "sbx" ]]; then
       STORAGE_SUFFIX="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
       STORAGE_PREFIX="terraform"
       STORAGE_FULLNAME="${STORAGE_PREFIX}${STORAGE_SUFFIX}"
       az_login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}" "${STORAGE_FULLNAME}"
-      STORAGE_PASSWORD="$(az storage account keys list --account-name ${STORAGE_FULLNAME} --query \"[].value | [0]\")"
+      STORAGE_PASSWORD="$(az storage account keys list --account-name ${STORAGE_FULLNAME} --query "[].value | [0]")"
       create_storage_container "${STORAGE_PASSWORD}" "${STORAGE_FULLNAME}"
       set_storage_credentials "${PREFIX}" "${STORAGE_FULLNAME}" "${STORAGE_PASSWORD}"
     else
