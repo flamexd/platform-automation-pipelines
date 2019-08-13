@@ -41,7 +41,7 @@ run:
       az cloud set \
         --name "${cloud_type}"
     }
-    
+
     function create_resource_group() {
       local resource_group="${1}"
       local location="${2}"
@@ -83,7 +83,7 @@ run:
         --account-name ${account_fullname}
     }
 
-    if "sbx" ~= "${FOUNDATION}"; then
+    if [[ "${FOUNDATION}" =~ "sbx" ]] ; then
       login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}"
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
