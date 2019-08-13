@@ -33,4 +33,3 @@ git:
     username: admin                          # a dummy username will work if we're using private_key for authentication
     private_key: ((git_user.private_key))    # The private for access to configuration repo
     public_key: ((git_user.public_key))
-
