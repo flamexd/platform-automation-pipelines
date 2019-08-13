@@ -1,17 +1,17 @@
 ---
 foundation: sbx-4
-location: usgovvirginia
 dns_suffix: logux.net
-terraform_source: terraform-repo/cie/terraforming-pas
-# FIXME (@conzetti): find a better convention for this git repo
-terraform_repo: git@ssh.dev.azure.com:v3/log-ux/prometheus/bespin-dojo
+terraform_source: terraforming-pas/cie/terraforming-pas
 
 azure:
-  subscription_id: ((azure_subscription_id))
-  tenant_id: ((azure_tenant_id))
   client:
     username: ((azure_client.username))
     password: ((azure_client.password))
+  cloud_name: usgovernment
+  region: usgovvirginia
+  resource_group: sbx-4
+  subscription_id: ((azure_subscription_id))
+  tenant_id: ((azure_tenant_id))
 
 azure_storage_accounts:
   terraform:  # State files for terraform state (terraform [tfstate])
@@ -42,6 +42,7 @@ credhub:
 git:
   configuration:                             # The configuration repo
     uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/platform-automation-pipelines
+    terraform_uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/bespin-dojo
     branch: master
   user:                                      # The user for access to configuration repo
     email: ((pcf_admin_email))               # a dummy email will work if we're using private_key for authentication

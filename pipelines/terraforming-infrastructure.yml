@@ -38,7 +38,7 @@ terraform-storage-params: &terraform-storage-params
   storage_account_name: ((azure_storage_accounts.terraform.username))
   key: terraform.tfstate
   access_key: ((azure_storage_accounts.terraform.password))
-  environment: usgovernment
+  environment: ((azure.cloud_name))
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Resource Types not included with Concourse                        │
@@ -102,26 +102,27 @@ resources:
       <<: *terraform-storage-params
     vars:
       env_name: ((foundation))
-      cloud_name: usgovernment
-      location: ((location))
+      cloud_name: ((azure.cloud_name))
+      location: ((azure.region))
       subscription_id: ((azure.subscription_id))
       tenant_id: ((azure.tenant_id))
       client_id: ((azure_client.username))
       client_secret: ((azure_client.password))
       dns_suffix: ((dns_suffix))
       dns_subdomain: ((foundation))
+      ops_manager_image_uri: ""
 
 - name: terraforming-pas
   type: git
   source:
     branch: ((git.configuration.branch))
-    uri: ((terraform_repo))
+    uri: ((git.configuration.terraform_uri))
     private_key: ((git.user.private_key))
 
 - name: platform-automation-pipelines
   type: git
   source:
-    branch: master
+    branch: ((git.configuration.branch))
     uri: ((git.configuration.uri))
     private_key: ((git.user.private_key))
 
@@ -164,6 +165,7 @@ resources:
 jobs:
 - name: create-terraform-storage
   plan:
+  - get: terraforming-pas
   - get: platform-automation-pipelines
   - get: platform-automation-image
   - task: create-terraform-storage
@@ -174,15 +176,15 @@ jobs:
       AZURE_TENANT_ID: ((azure.tenant_id))
       AZURE_CLIENT_ID: ((azure.client.username))
       AZURE_CLIENT_SECRET: ((azure.client.password))
-      AZURE_LOCATION: ((location))
-      AZURE_RESOURCE_GROUP: ((foundation))
+      AZURE_LOCATION: ((azure.region))
+      AZURE_RESOURCE_GROUP: ((azure.resource_group))
       FOUNDATION: ((foundation))
       <<: *credhub-params
 
 - name: terraform-plan
   plan:
   - get: terraforming-pas
-    trigger: false
+    passed: [create-terraform-storage]
   - put: terraform
     params:
       env_name: ((foundation))
@@ -205,8 +207,6 @@ jobs:
   plan:
   - get: platform-automation-image
   - get: terraforming-pas
-    params:
-      unpack: true
     passed: [terraform-apply]
 
   - task: update-credhub
@@ -223,9 +223,9 @@ jobs:
   serial: true
   plan:
   - get: platform-automation-image
+    passed: [credhub-creds-creation]
   - get: generated-terraform-state
   - get: platform-automation-pipelines
-    # passed: [credhub-creds-creation]
 
   - task: generate-opsman-state
     image: platform-automation-image
@@ -239,8 +239,6 @@ jobs:
   serial: true
   plan:
   - get: terraforming-pas
-    params:
-      unpack: true
   - put: terraform
     params:
       env_name: ((foundation))
