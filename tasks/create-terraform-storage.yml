@@ -2,27 +2,46 @@
 platform: linux
 
 params:
-  AZURE_CLOUD_TYPE:
-  SUBSCRIPTION_ID:
-  TENANT_ID:
-  CLIENT_SECRET: 
-  RESOURCE_GROUP:
-  LOCATION:
-  # - ^AZURE-CLI* variables
-
+  AZURE_CLOUD_TYPE: AzureUSGovernment
+  AZURE_SUBSCRIPTION_ID:
+  AZURE_TENANT_ID:
+  AZURE_CLIENT_ID:
+  AZURE_CLIENT_SECRET:
+  AZURE_RESOURCE_GROUP:
+  AZURE_LOCATION:
+  # - ^AZURE_* variables
+  # - AZ CLI details
+  CREDHUB_SERVER:
+  CREDHUB_CA_CERT:
+  CREDHUB_CLIENT:
+  CREDHUB_SECRET:
+  # - ^CREDHUB_* variables
+  # - Credhub connection details
+  PREFIX:
+  # - Prefix to credential in credhub
+  FOUNDATION:
 
 run:
   path: bash
   args:
   - "-c"
   - |
-    # WIP: add code to create storage account
-    # set cloud (fixme: tj/conzetti)
-    # needs to be updated (remove comment after)
-    export AZURE_STORAGE_ACCOUNT=$(openssl rand -base64 500 | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1)
-    export AZURE_STORAGE_KEY=""
-    az login --service-principal -u "${SUBSCRIPTION_ID}" -p "${CLIENT_SECRET}" --tenant "${TENANT_ID}"
-    az cloud set -n "${AZURE_CLOUD_TYPE}"
-    az group create -n "${RESOURCE_GROUP}" -l "${LOCATION}"
-    az storage account create -n "${AZURE_STORAGE_ACCOUNT}" -g "${RESOURCE_GROUP}" -l "${LOCATION}"
-    az storage container create -n terraform
+    function generate_resource_group() {
+      az login --service-principal -u "${AZURE_CLIENT_ID}" -p "${AZURE_CLIENT_SECRET}" --tenant "${AZURE_TENANT_ID}"
+      az cloud set -n "${AZURE_CLOUD_TYPE}"
+      az group create -n "${AZURE_RESOURCE_GROUP}" -l "${AZURE_LOCATION}"
+    }
+
+    function generate_storage_account() {
+      local AZURE_STORAGE_ACCOUNT=$(openssl rand -base64 500 | tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1)
+      local AZURE_STORAGE_KEY=""
+      az storage account create -n "${AZURE_STORAGE_ACCOUNT}" -g "${AZURE_RESOURCE_GROUP}" -l "${AZURE_LOCATION}"
+      az storage container create -n terraform
+    }
+
+    if "sbx" ~= "${FOUNDATION}"; then
+      generate_resource_group
+      generate_storage_account
+    else 
+      generate_storage_account
+    fi

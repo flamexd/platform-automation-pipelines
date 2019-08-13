@@ -11,6 +11,13 @@
 #├ storage-params:                                                   │
 #│ └── Params for Azure Storage location                             │
 #└───────────────────────────────────────────────────────────────────┘
+credhub-params: &credhub-params
+  CREDHUB_SERVER: ((credhub.server))
+  CREDHUB_CA_CERT: ((credhub.ca_cert))
+  CREDHUB_CLIENT: ((credhub.client))
+  CREDHUB_SECRET: ((credhub.secret))
+  PREFIX: /concourse/((foundation))
+
 deploy-storage-params: &deploy-storage-params
   storage_account_name: ((azure_storage_accounts.deploy.username))
   storage_account_key: ((azure_storage_accounts.deploy.password))
@@ -66,17 +73,6 @@ resource_types:
     repository: ((registry_uri))/azure/terraform-resource
     tag: 0.12.4
 
-# - name: azure-cli-resource
-#   type: docker-image
-#   source:
-#     username: admin
-#     password: ((registry_password))
-#     ca_certs:
-#     - domain: ((registry_uri))
-#       cert: ((control-plane-ca-cert))
-#     repository: ((registry_uri))/azure/azure-cli
-#     tag: latest
-
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Resources for Terraforming IaaS                                   │
 #│                                                                   │
@@ -125,7 +121,7 @@ resources:
 - name: platform-automation-pipelines
   type: git
   source:
-    branch: feature-terraform-infrastructure
+    branch: ((git.configuration.branch))
     uri: ((git.configuration.uri))
     private_key: ((git.user.private_key))
 
@@ -141,19 +137,7 @@ resources:
     versioned_file: state.yml
     <<: *state-storage-params
 
-# - name: platform-automation-tasks
-#   type: azure-blobstore
-#   source:
-#     regexp: .*tasks-(.*).zip
-#     <<: *deploy-storage-params
-
 - name: platform-automation-image
-  type: azure-blobstore
-  source:
-    regexp: .*image-(.*).tgz
-    <<: *deploy-storage-params
-
-- name: azure-cli
   type: docker-image
   source:
     username: admin
@@ -181,17 +165,19 @@ jobs:
 - name: create-terraform-storage
   plan:
   - get: platform-automation-pipelines
-  - get: azure-cli
+  - get: platform-automation-image
   - task: create-terraform-storage
-    image: azure-cli
+    image: platform-automation-image
     file: platform-automation-pipelines/tasks/create-terraform-storage.yml
     params:
-      AZURE_CLOUD_TYPE: AzureUSGovernment
-      SUBSCRIPTION_ID: ((azure.subscription_id))
-      TENANT_ID: ((azure.tenant_id))
-      CLIENT_SECRET: ((azure.client.password))))
-      LOCATION: ((location))
-      RESOURCE_GROUP: ((foundation))
+      AZURE_SUBSCRIPTION_ID: ((azure.subscription_id))
+      AZURE_TENANT_ID: ((azure.tenant_id))
+      AZURE_CLIENT_ID: ((azure.client.username))
+      AZURE_CLIENT_SECRET: ((azure.client.password))
+      AZURE_LOCATION: ((location))
+      AZURE_RESOURCE_GROUP: ((foundation))
+      FOUNDATION: ((foundation))
+      <<: *credhub-params
 
 - name: terraform-plan
   plan:
@@ -218,8 +204,6 @@ jobs:
   serial: true
   plan:
   - get: platform-automation-image
-    params:
-      unpack: true
   - get: terraforming-pas
     params:
       unpack: true
@@ -239,8 +223,6 @@ jobs:
   serial: true
   plan:
   - get: platform-automation-image
-    params:
-      unpack: true
   - get: generated-terraform-state
   - get: platform-automation-pipelines
     # passed: [credhub-creds-creation]
