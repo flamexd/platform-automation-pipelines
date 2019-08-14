@@ -4,12 +4,14 @@
 #│                                                                   │
 #├ deploy-storage-params:                                            │
 #│ └── Params for Azure Storage for products to deploy               │
-#├ state-storage-params:                                            │
-#│ └── Params for Azure Storage for state related outputs            │
 #├ om-creds:                                                         │
 #│ └── Credentials for opsman login                                  │
-#├ storage-params:                                                   │
-#│ └── Params for Azure Storage location                             │
+#├ state-storage-params:                                             │
+#│ └── Params for Azure Storage for state related outputs            │
+#├ terraform-storage-params:                                         │
+#│ └── Params for Azure Storage for terraform related outputs        │
+#├ terraform-backend-params:                                         │
+#│ └── Params for Azure Storage for terraform blobstore backend      │
 #└───────────────────────────────────────────────────────────────────┘
 credhub-params: &credhub-params
   CREDHUB_SERVER: ((credhub.server))
@@ -24,17 +26,30 @@ deploy-storage-params: &deploy-storage-params
   container: product
   base_url: ((azure_storage_accounts.base_url))
 
-state-storage-params: &state-storage-params
-  storage_account_name: ((azure_storage_accounts.state.username))
-  storage_account_key: ((azure_storage_accounts.state.password))
-  container: terraform
-  base_url: ((azure_storage_accounts.base_url))
-
 om-creds: &om-creds
   OM_USERNAME: ((opsman_admin.username))
   OM_PASSWORD: ((opsman_admin.password))
 
+registry-params: &registry-params
+  username: admin
+  password: ((registry_password))
+  ca_certs:
+  - domain: ((registry_uri))
+    cert: ((control-plane-ca-cert))
+
+state-storage-params: &state-storage-params
+  storage_account_name: ((azure_storage_accounts.state.username))
+  storage_account_key: ((azure_storage_accounts.state.password))
+  container: p-automator
+  base_url: ((azure_storage_accounts.base_url))
+
 terraform-storage-params: &terraform-storage-params
+  storage_account_name: ((azure_storage_accounts.terraform.username))
+  storage_account_key: ((azure_storage_accounts.terraform.password))
+  container: terraform
+  base_url: ((azure_storage_accounts.base_url))
+
+terraform-backend-params: &terraform-backend-params
   storage_account_name: ((azure_storage_accounts.terraform.username))
   key: terraform.tfstate
   access_key: ((azure_storage_accounts.terraform.password))
@@ -99,7 +114,7 @@ resources:
     backend_type: azurerm
     backend_config:
       container_name: terraform
-      <<: *terraform-storage-params
+      <<: *terraform-backend-params
     vars:
       env_name: ((foundation))
       cloud_name: ((azure.cloud_name))
@@ -122,15 +137,15 @@ resources:
 - name: platform-automation-pipelines
   type: git
   source:
-    branch: ((git.configuration.branch))
+    branch: ((git.configuration.terraform_branch))
     uri: ((git.configuration.uri))
     private_key: ((git.user.private_key))
 
 - name: generated-terraform-state
   type: azure-blobstore
   source:
-    versioned_file: terraform.tfstate
-    <<: *state-storage-params
+    versioned_file: terraform.tfstateenv:((foundation))
+    <<: *terraform-storage-params
 
 - name: generated-opsman-state
   type: azure-blobstore
@@ -141,13 +156,16 @@ resources:
 - name: platform-automation-image
   type: docker-image
   source:
-    username: admin
-    password: ((registry_password))
-    ca_certs:
-    - domain: ((registry_uri))
-      cert: ((control-plane-ca-cert))
+    <<: *registry-params
     repository: ((registry_uri))/azure/platform-automation
     tag: 3.0.5
+
+- name: terraform-image
+  type: docker-image
+  source:
+    <<: *registry-params
+    repository: ((registry_uri))/azure/terraform-resource
+    tag: 0.12.4
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Operations Manager Install Workflow                      │
@@ -205,27 +223,35 @@ jobs:
 - name: credhub-creds-creation
   serial: true
   plan:
+  - get: terraform-image
   - get: platform-automation-image
+  - get: platform-automation-pipelines
+  - get: generated-terraform-state
   - get: terraforming-pas
     passed: [terraform-apply]
 
+  - task: extract-terraform-variables
+    image: terraform-image
+    file: platform-automation-pipelines/tasks/extract-terraform-variables.yml
+    params:
+      FOUNDATION: ((foundation))
+      PREFIX: /concourse/((foundation))
+
   - task: update-credhub
-    image: terraform
-    file: platform-automation-pipelines/tasks/credhub-sets.yml
+    image: platform-automation-image
+    file: platform-automation-pipelines/tasks/update-credhub.yml
     params:
       CREDHUB_SERVER: ((credhub.server))
       CREDHUB_CA_CERT: ((credhub.ca_cert))
       CREDHUB_CLIENT: ((credhub.client))
       CREDHUB_SECRET: ((credhub.secret))
-      PREFIX: /concourse/((foundation))
 
 - name: save-state-file
   serial: true
   plan:
   - get: platform-automation-image
-    passed: [credhub-creds-creation]
-  - get: generated-terraform-state
   - get: platform-automation-pipelines
+    passed: [credhub-creds-creation]
 
   - task: generate-opsman-state
     image: platform-automation-image

@@ -1,0 +1,19 @@
+---
+platform: linux
+
+inputs:
+- name: credhub-import
+
+params:
+  CREDHUB_SERVER:
+  CREDHUB_CA_CERT:
+  CREDHUB_CLIENT:
+  CREDHUB_SECRET:
+  # - ^CREDHUB_* variables
+  # - Credhub connection details
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - bash credhub-import/vars.sh
