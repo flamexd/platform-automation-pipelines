@@ -46,6 +46,13 @@ run:
         --subscription "${subscription_id}"
     }
 
+    function find_existing_resource_group() {
+      local resource_group="${1}"
+
+      az group list \
+        --query '[].name' | grep -q "${resource_group}"
+    }
+
     function create_resource_group() {
       local resource_group="${1}"
       local location="${2}"
@@ -66,6 +73,15 @@ run:
         --name "${credhub_prefix}/${storage_account}" \
         --username "${storage_fullname}" \
         --password "${storage_password}"
+    }
+
+    function find_existing_accounts() {
+      local resource_group="${1}"
+      local storage_prefix="${2}"
+
+      az storage account list \
+        --resource-group "${resource_group}" \
+        --query '[].name' | grep -q "${storage_container}"
     }
 
     function create_storage_account() {
@@ -90,19 +106,23 @@ run:
         --account-key "${storage_password}"
     }
 
-    if [[ "${FOUNDATION}" =~ "sbx" ]]; then
-      STORAGE_SUFFIX="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
-      STORAGE_PREFIX="terraform"
-      STORAGE_FULLNAME="${STORAGE_PREFIX}${STORAGE_SUFFIX}"
-      az_login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
+    STORAGE_SUFFIX="$(openssl rand -base64 500 | tr -dc 'a-z0-9' | fold -w 12 | head -n 1)"
+    STORAGE_PREFIX="terraform"
+    STORAGE_FULLNAME="${STORAGE_PREFIX}${STORAGE_SUFFIX}"
+    az_login "${AZURE_CLIENT_ID}" "${AZURE_CLIENT_SECRET}" "${AZURE_TENANT_ID}" "${AZURE_CLOUD_TYPE}" "${AZURE_SUBSCRIPTION_ID}"
+
+    if find_existing_resource_group "${AZURE_RESOURCE_GROUP}" 2>/dev/null; then 
+      echo "Resource Group "${AZURE_RESOURCE_GROUP}" already exists "
+    else
       create_resource_group "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}"
+    fi
+
+    if find_existing_accounts "${AZURE_RESOURCE_GROUP}" "${STORAGE_PREFIX}" 2>/dev/null; then 
+      echo "Storage account already exists"
+    else
       create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}" "${STORAGE_FULLNAME}"
       TEMP_STORAGE_PASSWORD="$(az storage account keys list --account-name ${STORAGE_FULLNAME} --query "[].value | [0]")"
       STORAGE_PASSWORD="${TEMP_STORAGE_PASSWORD//\"}"
-      create_storage_container "${STORAGE_PASSWORD}" "${STORAGE_FULLNAME}"
-      set_storage_credentials "${PREFIX}" "${STORAGE_FULLNAME}" "${STORAGE_PASSWORD}"
-    else
-      create_storage_account "${AZURE_RESOURCE_GROUP}" "${AZURE_LOCATION}" "${STORAGE_FULLNAME}"
       create_storage_container "${STORAGE_PASSWORD}" "${STORAGE_FULLNAME}"
       set_storage_credentials "${PREFIX}" "${STORAGE_FULLNAME}" "${STORAGE_PASSWORD}"
     fi
