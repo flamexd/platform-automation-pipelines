@@ -56,6 +56,30 @@ terraform-backend-params: &terraform-backend-params
   environment: ((azure.cloud_name))
 
 #┌───────────────────────────────────────────────────────────────────┐
+#├ Job Groups                                                        │
+#│                                                                   │
+#├ create:                                                           │
+#│ ├── create-terraform-storage                                      │
+#│ ├── terraform-plan                                                │
+#│ ├── terraform-apply                                               │
+#│ ├── credhub-creds-creation                                        │
+#│ └── save-state-file                                               │
+#├ destroy:                                                          │
+#│ └── terraform-destroy                                             │
+#└───────────────────────────────────────────────────────────────────┘
+groups:
+- name: create
+  jobs:
+  - create-terraform-storage
+  - terraform-plan
+  - terraform-apply
+  - credhub-creds-creation
+  - save-state-file
+- name: destroy
+  jobs:
+  - terraform-destroy
+
+#┌───────────────────────────────────────────────────────────────────┐
 #├ Resource Types not included with Concourse                        │
 #│                                                                   │
 #├ azure-blobstore:                                                  │
@@ -265,8 +289,9 @@ jobs:
   serial: true
   plan:
   - get: terraforming-pas
+    passed: [terraform-apply]
   - put: terraform
     params:
-      env_name: ((foundation))
       terraform_source: ((terraform_source))
+      env_name: ((foundation))
       action: destroy
