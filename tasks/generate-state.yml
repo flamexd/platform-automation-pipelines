@@ -11,8 +11,8 @@ run:
   - |
     main() {
       set +x
-        echo "{"iaas": "azure", "vm_id": ""}" > state/state.yml"
+        echo '{"iaas": "azure", "vm_id": ""}' > state/state.yml
       set -x
     }
 
-    main "$@"
+    main

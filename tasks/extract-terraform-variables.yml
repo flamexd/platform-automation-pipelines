@@ -1,0 +1,92 @@
+---
+platform: linux
+
+inputs:
+- name: generated-terraform-state
+- name: platform-automation-pipelines
+
+outputs:
+- name: credhub-import
+
+params:
+  FOUNDATION:
+  # - PCF foundation to target
+  PREFIX:
+  # - Prefix to credential in credhub
+
+run:
+  path: bash
+  args:
+  - "-c"
+  - |
+    shopt -s expand_aliases
+
+    alias tfout='terraform output -state=generated-terraform-state/terraform.tfstateenv:${FOUNDATION}'
+
+    function create_users() {
+      local prefix="${1}"
+      local credential_name="${2}"
+      local username="${3}"
+      local password="${4:-j6WVAiB94aqEYuVUvOd9}"
+
+      echo credhub set \
+        --name "${prefix}/${credential_name}" \
+        --type user \
+        --username "${username}" \
+        --password "${password}" >> credhub-import/vars.sh
+    }
+
+    function create_value() {
+      local prefix="${1}"
+      local credential_name="${2}"
+      local value="${3}"
+
+      echo credhub set \
+        --name "${prefix}/${credential_name}" \
+        --type value \
+        --value "${value}" >> credhub-import/vars.sh
+    }
+
+    create_users "${PREFIX}" "azure-deploy-storage-account" \
+      "$(tfout deploy_backup_storage_account_name)" \
+      "$(tfout deploy_backup_storage_account_access_key)"
+
+    create_users "${PREFIX}" "azure-opsman-storage-account" \
+      "$(tfout bosh_root_storage_account)"
+
+    create_users "${PREFIX}" "azure-pas-storage-account" \
+      "$(tfout cf_storage_account_name)" \
+      "$(tfout cf_storage_account_access_key)"
+
+    create_users "${PREFIX}" "azure-state-storage-account" \
+      "$(tfout state_storage_account_name)" \
+      "$(tfout state_storage_account_access_key)"
+
+    create_users "${PREFIX}" "azure_client" \
+      "$(tfout client_id)" \
+      "$(tfout client_secret)"
+
+    echo OPSMAN_PASSWORD="\$(credhub get \
+      --name ${PREFIX}/opsman_admin \
+      --key password)" >> credhub-import/vars.sh
+
+    cat <<EOF >> credhub-import/vars.sh
+    if [[ ! -n "\${OPSMAN_PASSWORD}" ]]; then
+      credhub generate \
+              --name "${PREFIX}/opsman_admin" \
+              --type user \
+              --username "admin"
+    fi
+    EOF
+
+    echo OPSMAN_PASSWORD="\$(credhub get \
+      --name ${PREFIX}/opsman_admin \
+      --key password)" >> credhub-import/vars.sh
+
+    create_value "${PREFIX}" "decryption_passphrase" "\${OPSMAN_PASSWORD}"
+    create_value "${PREFIX}" "azure_resource_group" "$(tfout pcf_resource_group_name)"
+    create_value "${PREFIX}" "azure_subscription" "$(tfout subscription_id)"
+    create_value "${PREFIX}" "azure_tenant_id" "$(tfout tenant_id)"
+    create_value "${PREFIX}" "om_external_ip" "$(tfout ops_manager_public_ip)"
+    create_value "${PREFIX}" "om_internal_ip" "$(tfout ops_manager_private_ip)"
+    create_value "${PREFIX}" "opsman_target" "$(tfout ops_manager_dns)"

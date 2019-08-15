@@ -43,6 +43,7 @@ git:
   configuration:                             # The configuration repo
     uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/platform-automation-pipelines
     terraform_uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/bespin-dojo
+    terraform_branch: master
     branch: master
   user:                                      # The user for access to configuration repo
     email: ((pcf_admin_email))               # a dummy email will work if we're using private_key for authentication
