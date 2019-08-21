@@ -81,7 +81,7 @@ run:
 
       az storage account list \
         --resource-group "${resource_group}" \
-        --query '[].name' | grep -q "${storage_container}"
+        --query '[].name' | grep -q "${storage_prefix}"
     }
 
     function create_storage_account() {
