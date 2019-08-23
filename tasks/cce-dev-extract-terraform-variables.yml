@@ -47,9 +47,9 @@ run:
         --value "${value}" >> credhub-import/vars.sh
     }
 
-    # create_users "${PREFIX}" "azure-deploy-storage-account" \
-    #   "$(tfout deploy_backup_storage_account_name)" \
-    #   "$(tfout deploy_backup_storage_account_access_key)"
+    create_users "${PREFIX}" "azure-deploy-storage-account" \
+      "$(tfout deploy_backup_storage_account_name)" \
+      "$(tfout deploy_backup_storage_account_access_key)"
 
     create_users "${PREFIX}" "azure-opsman-storage-account" \
       "$(tfout bosh_root_storage_account)"
@@ -89,4 +89,4 @@ run:
     create_value "${PREFIX}" "azure_tenant_id" "$(tfout tenant_id)"
     # create_value "${PREFIX}" "om_external_ip" "$(tfout ops_manager_public_ip)"
     create_value "${PREFIX}" "om_internal_ip" "$(tfout ops_manager_private_ip)"
-    # create_value "${PREFIX}" "opsman_target" "$(tfout ops_manager_dns)"
+    create_value "${PREFIX}" "opsman_target" "$(tfout ops_manager_private_ip)"
