@@ -4,7 +4,7 @@ products:
   # Ops Manager
   opsman:
     product-version: 2.6.4
-    product-regex: ops-manager-azure-(2.6.*).yml
+    product-regex: ops-manager-(2.6.*)-build(.*).yml
 
   # PAS
   pas:
