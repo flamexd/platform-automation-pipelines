@@ -11,7 +11,7 @@ azure:
   tenant_id: ((azure_tenant_id))
   client_id: ((azure_client.username))
   client_secret: ((azure_client.password))
-  location: usgovvirginia
+  location: usdodeast
   network_security_group: dev-ops-manager-security-group
   vpc_subnet: /subscriptions/((azure_subscription))/resourceGroups/((azure_resource_group))/providers/Microsoft.Network/virtualNetworks/((azure_resource_group))-virtual-network/subnets/((azure_resource_group))-infrastructure-subnet
 
@@ -30,7 +30,7 @@ azure:
   # storage_key: ((azure_opsman_blob.password))
   # container: ((azure_opsman_container))                    # container for opsman image
 
-  ssh_public_key: ((git_user.public_key))
+  ssh_public_key: (opsman_ssh.public_key))
   vm_name: ops-manager-vm-3                     # default: Ops Manager-vm
   boot_disk_size: 100                           # default: 200
   cloud_name: AzureUSGovernment                 # default: AzureCloud
