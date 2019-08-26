@@ -8,8 +8,8 @@ azure:
     username: ((azure_client.username))
     password: ((azure_client.password))
   cloud_name: usgovernment
-  region: usgovvirginia
-  resource_group: dev
+  region: usdodeast
+  resource_group: ((azure_resource_group))
   subscription_id: ((azure_subscription_id))
   tenant_id: ((azure_tenant_id))
 
@@ -32,7 +32,7 @@ azure_storage_accounts:
   base_url: core.usgovcloudapi.net
 
 credhub:
-  server: https://10.126.10.136:8844  # CredHub endpoint
+  server: https://concourse.credhub.dev.logux.net:8844  # CredHub endpoint
   ca_cert: ((credhub_ca_cert))                    # CA Cert from CredHub
   client: credhub_admin_client                    # UAA Client for CredHub access
   secret: ((credhub_password))                    # UAA secret for CredHub access
@@ -41,12 +41,11 @@ credhub:
 
 git:
   configuration:                             # The configuration repo
-    uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/platform-automation-pipelines
-    terraform_uri: git@ssh.dev.azure.com:v3/log-ux/prometheus/bespin-dojo
+    uri: https://log-ux:((git_access_token))@dev.azure.com/log-ux/prometheus/_git/platform-automation-pipelines
+    terraform_uri: https://log-ux:((git_access_token))@dev.azure.com/log-ux/prometheus/_git/bespin-dojo
     terraform_branch: master
     branch: master
   user:                                      # The user for access to configuration repo
-    email: ((pcf_admin_email))               # a dummy email will work if we're using private_key for authentication
-    username: admin                          # a dummy username will work if we're using private_key for authentication
-    private_key: ((git_user.private_key))    # The private for access to configuration repo
-    public_key: ((git_user.public_key))
+    email: ((pcf_admin_email))               
+    username: ((git_user.username))                        
+    password: ((git_user.password))    
