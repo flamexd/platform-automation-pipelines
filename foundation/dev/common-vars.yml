@@ -2,6 +2,18 @@
 foundation: dev
 dns_suffix: dev.logux.net
 terraform_source: terraforming-pas/cce/terraforming-pas
+isolation_segment: 0
+ops_manager_image_uri: https://opsmanagereastus.blob.core.windows.net/images/ops-manager-2.6.4-build.166.vhd
+ops_manager_vm_size: Standard_A4_v2
+infrastructure_subnet_id: /subscriptions/((azure_subscription))/resourceGroups/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/subnets/AZ-DE-DOD-AF-CCE-A4-D-IL4-LOGUX-PCFINF-SNT-01
+ops_manager_private_ip: 10.126.10.97
+pas_subnet_id: /subscriptions/((azure_subscription))/resourceGroups/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/subnets/AZ-DE-DOD-AF-CCE-A4-D-IL4-LOGUX-PCFPAS-SNT-01
+pas_subnet_name: AZ-DE-DOD-AF-CCE-D-IL5-LOGUX-PCFPAS-SNT-01
+pas_subnet_cidr: 22
+pas_subnet_gateway: 10.127.0.1
+weblb_private_ip: 10.127.0.4
+services_subnet_cidr: 22
+services_subnet_gateway: 10.127.8.0
 
 azure:
   client:
@@ -32,7 +44,7 @@ azure_storage_accounts:
   base_url: core.usgovcloudapi.net
 
 credhub:
-  server: https://concourse.credhub.dev.logux.net:8844  # CredHub endpoint
+  server: https://credhub.control.dev.logux.net:8844  # CredHub endpoint
   ca_cert: ((credhub_ca_cert))                    # CA Cert from CredHub
   client: credhub_admin_client                    # UAA Client for CredHub access
   secret: ((credhub_password))                    # UAA secret for CredHub access
