@@ -47,17 +47,9 @@ resource_types:
   source:
     username: admin
     password: ((registry_password))
-    client_certs:
-    - domain: ((registry_uri))
-      cert: |
-        ((control-plane-ssl-cert))
-      key: |
-        ((control-plane-ssl-key))
-    ca_certs:
-    - domain: ((registry_uri))
-      cert: |
-        ((control-plane-ca-cert))
-    repository: ((registry_uri))/azure/azure-blobstore-resource
+    insecure_registries:
+      - ((registry_uri))
+    repository: ((registry_uri))/library/azure-blobstore-resource
     tag: latest
 
 #┌───────────────────────────────────────────────────────────────────┐
@@ -76,7 +68,6 @@ resources:
 - name: platform-automation-pipelines
   type: git
   source:
-    private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
     branch: ((git.configuration.branch))
 
@@ -98,13 +89,13 @@ resources:
   type: azure-blobstore
   source:
     regexp: installation-after-(.*).zip
-    container: opsmgr
+    container: opsmanager
     <<: *state-storage-params
 
 - name: state-file
   type: azure-blobstore
   source:
-    regexp: st(.*).yml
+    versioned_file: state.yml
     container: p-automator
     <<: *state-storage-params
 
