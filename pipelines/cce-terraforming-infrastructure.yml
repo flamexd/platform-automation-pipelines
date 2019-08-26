@@ -1,0 +1,300 @@
+---
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Reusable anchors                                                  │
+#│                                                                   │
+#├ deploy-storage-params:                                            │
+#│ └── Params for Azure Storage for products to deploy               │
+#├ om-creds:                                                         │
+#│ └── Credentials for opsman login                                  │
+#├ state-storage-params:                                             │
+#│ └── Params for Azure Storage for state related outputs            │
+#├ terraform-storage-params:                                         │
+#│ └── Params for Azure Storage for terraform related outputs        │
+#├ terraform-backend-params:                                         │
+#│ └── Params for Azure Storage for terraform blobstore backend      │
+#└───────────────────────────────────────────────────────────────────┘
+credhub-params: &credhub-params
+  CREDHUB_SERVER: ((credhub.server))
+  CREDHUB_CA_CERT: ((credhub.ca_cert))
+  CREDHUB_CLIENT: ((credhub.client))
+  CREDHUB_SECRET: ((credhub.secret))
+  PREFIX: /concourse/((foundation))
+
+deploy-storage-params: &deploy-storage-params
+  storage_account_name: ((azure_storage_accounts.deploy.username))
+  storage_account_key: ((azure_storage_accounts.deploy.password))
+  container: product
+  base_url: ((azure_storage_accounts.base_url))
+
+om-creds: &om-creds
+  OM_USERNAME: ((opsman_admin.username))
+  OM_PASSWORD: ((opsman_admin.password))
+
+registry-params: &registry-params
+  username: admin
+  password: ((registry_password))
+  insecure_registries:
+  - ((registry_uri))
+
+state-storage-params: &state-storage-params
+  storage_account_name: ((azure_storage_accounts.state.username))
+  storage_account_key: ((azure_storage_accounts.state.password))
+  container: p-automator
+  base_url: ((azure_storage_accounts.base_url))
+
+terraform-storage-params: &terraform-storage-params
+  storage_account_name: ((azure_storage_accounts.terraform.username))
+  storage_account_key: ((azure_storage_accounts.terraform.password))
+  container: terraform
+  base_url: ((azure_storage_accounts.base_url))
+
+terraform-backend-params: &terraform-backend-params
+  storage_account_name: ((azure_storage_accounts.terraform.username))
+  key: terraform.tfstate
+  access_key: ((azure_storage_accounts.terraform.password))
+  environment: ((azure.cloud_name))
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Job Groups                                                        │
+#│                                                                   │
+#├ create:                                                           │
+#│ ├── create-terraform-storage                                      │
+#│ ├── terraform-plan                                                │
+#│ ├── terraform-apply                                               │
+#│ ├── credhub-creds-creation                                        │
+#│ └── save-state-file                                               │
+#├ destroy:                                                          │
+#│ └── terraform-destroy                                             │
+#└───────────────────────────────────────────────────────────────────┘
+groups:
+- name: create
+  jobs:
+  - create-terraform-storage
+  - terraform-plan
+  - terraform-apply
+  - credhub-creds-creation
+  - save-state-file
+- name: destroy
+  jobs:
+  - terraform-destroy
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Resource Types not included with Concourse                        │
+#│                                                                   │
+#├ azure-blobstore:                                                  │
+#│ ├── Necessary to access the Azure Blobstore containers            │
+#│ └── Container image is stored in a private docker registry.       │
+#├ terraform-resource:                                               │
+#│ ├── Necessary to access the Azure Blobstore containers            │
+#│ └── Container image is stored in a private docker registry.       │
+#└───────────────────────────────────────────────────────────────────┘
+resource_types:
+- name: azure-blobstore
+  type: docker-image
+  source:
+    username: admin
+    password: ((registry_password))
+    insecure_registries:
+    - ((registry_uri))
+    repository: ((registry_uri))/library/azure-blobstore-resource
+    tag: latest
+
+- name: terraform-resource
+  type: docker-image
+  source:
+    username: admin
+    password: ((registry_password))
+    insecure_registries:
+    - ((registry_uri))
+    repository: ((registry_uri))/library/terraform-resource
+    tag: 0.12.4
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Resources for Terraforming IaaS                                   │
+#│                                                                   │
+#| terraform                                                         |
+#│ └── Terraform state                                               │
+#│                                                                   │
+#| git                                                               |
+#│ ├── Terraforming PAS                                              │
+#│ └── Platform Automation Pipelines                                 │
+#│                                                                   │
+#├ azure-blobstore:                                                  │
+#│ ├── Terraforming Git Repo (tarball)                               │
+#│ ├── Terraforming State (generation)                               │
+#│ ├── Terraforming State (output - blobstore)                       │
+#│ ├── Platform Automation Tasks used in pipeline jobs/tasks         │
+#│ ├── Platform Automation Pipelines Git Repo (this repo)            │
+#│ └── Platform Automation Docker image                              │
+#└───────────────────────────────────────────────────────────────────┘
+resources:
+- name: terraform
+  type: terraform-resource
+  source:
+    env_name: ((foundation))
+    backend_type: azurerm
+    backend_config:
+      container_name: terraform
+      <<: *terraform-backend-params
+    vars:
+      env_name: ((foundation))
+      cloud_name: ((azure.cloud_name))
+      location: ((azure.region))
+      subscription_id: ((azure.subscription_id))
+      tenant_id: ((azure.tenant_id))
+      client_id: ((azure_client.username))
+      client_secret: ((azure_client.password))
+      dns_suffix: ((dns_suffix))
+      dns_subdomain: ((foundation))
+      ops_manager_image_uri: ((ops_manager_image_uri))
+      isolation_segment: ((isolation_segment))
+      pas_subnet_id: ((pas_subnet_id))
+      pas_subnet_name: ((pas_subnet_name))
+      pas_subnet_gateway: ((pas_subnet_gateway))
+      pas_subnet_cidr: ((pas_subnet_cidr))
+      weblb_private_ip: ((weblb_private_ip))
+      services_subnet_cidr: ((services_subnet_cidr))
+      services_subnet_gateway: ((services_subnet_gateway))
+
+- name: terraforming-pas
+  type: git
+  source:
+    branch: ((git.configuration.branch))
+    uri: ((git.configuration.terraform_uri))
+
+- name: platform-automation-pipelines
+  type: git
+  source:
+    branch: ((git.configuration.terraform_branch))
+    uri: ((git.configuration.uri))
+
+- name: generated-terraform-state
+  type: azure-blobstore
+  source:
+    versioned_file: terraform.tfstateenv:((foundation))
+    <<: *terraform-storage-params
+
+- name: generated-opsman-state
+  type: azure-blobstore
+  source:
+    versioned_file: state.yml
+    <<: *state-storage-params
+
+- name: platform-automation-image
+  type: docker-image
+  source:
+    <<: *registry-params
+    repository: ((registry_uri))/library/platform-automation
+    tag: 3.0.5
+
+- name: terraform-image
+  type: docker-image
+  source:
+    <<: *registry-params
+    repository: ((registry_uri))/library/terraform-resource
+    tag: 0.12.6
+
+#┌───────────────────────────────────────────────────────────────────┐
+#├ Jobs for Operations Manager Install Workflow                      │
+#│                                                                   │
+#├ Terraform the PAS environment                                     │
+#│ └── Use the terraform-resource to apply terraform and save state  │
+#│                                                                   │
+#├ Create Credhub Credentials from terraform.tfstate output          │
+#│                                                                   │
+#├ Create a basic state.yml file for use by p-automator create-vm    │
+#│ └── Used by the install-opsman.yml pipeline                       │
+#│                                                                   │
+#├ Initiate a terraform destroy to remove the environment            │
+#└───────────────────────────────────────────────────────────────────┘
+jobs:
+- name: create-terraform-storage
+  plan:
+  - get: terraforming-pas
+  - get: platform-automation-pipelines
+  - get: platform-automation-image
+  - task: create-terraform-storage
+    image: platform-automation-image
+    file: platform-automation-pipelines/tasks/create-terraform-storage.yml
+    params:
+      AZURE_SUBSCRIPTION_ID: ((azure.subscription_id))
+      AZURE_TENANT_ID: ((azure.tenant_id))
+      AZURE_CLIENT_ID: ((azure.client.username))
+      AZURE_CLIENT_SECRET: ((azure.client.password))
+      AZURE_LOCATION: ((azure.region))
+      AZURE_RESOURCE_GROUP: ((azure.resource_group))
+      FOUNDATION: ((foundation))
+      <<: *credhub-params
+
+- name: terraform-plan
+  plan:
+  - get: terraforming-pas
+    passed: [create-terraform-storage]
+  - put: terraform
+    params:
+      env_name: ((foundation))
+      terraform_source: ((terraform_source))
+      plan_only: true
+
+- name: terraform-apply
+  plan:
+  - get: terraforming-pas
+    trigger: true
+    passed: [terraform-plan]
+  - put: terraform
+    params:
+      env_name: ((foundation))
+      terraform_source: ((terraform_source))
+      plan_run: true
+
+- name: credhub-creds-creation
+  serial: true
+  plan:
+  - get: terraform-image
+  - get: platform-automation-image
+  - get: platform-automation-pipelines
+  - get: generated-terraform-state
+  - get: terraforming-pas
+    passed: [terraform-apply]
+
+  - task: extract-terraform-variables
+    image: terraform-image
+    file: platform-automation-pipelines/tasks/extract-terraform-variables.yml
+    params:
+      FOUNDATION: ((foundation))
+      PREFIX: /concourse/((foundation))
+
+  - task: update-credhub
+    image: platform-automation-image
+    file: platform-automation-pipelines/tasks/update-credhub.yml
+    params:
+      CREDHUB_SERVER: ((credhub.server))
+      CREDHUB_CA_CERT: ((credhub.ca_cert))
+      CREDHUB_CLIENT: ((credhub.client))
+      CREDHUB_SECRET: ((credhub.secret))
+
+- name: save-state-file
+  serial: true
+  plan:
+  - get: platform-automation-image
+  - get: platform-automation-pipelines
+    passed: [credhub-creds-creation]
+
+  - task: generate-opsman-state
+    image: platform-automation-image
+    file: platform-automation-pipelines/tasks/generate-state.yml
+
+  - put: generated-opsman-state
+    params:
+      file: state/state.yml
+
+- name: terraform-destroy
+  serial: true
+  plan:
+  - get: terraforming-pas
+    passed: [terraform-apply]
+  - put: terraform
+    params:
+      terraform_source: ((terraform_source))
+      env_name: ((foundation))
+      action: destroy
