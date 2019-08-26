@@ -7,8 +7,8 @@ iaas:
   default_security_group: dev-bosh-deployed-vms-security-group
   environment: AzureUSGovernment
   resource_group_name: ((azure_resource_group))
-  ssh_public_key: ((git_user.public_key))
-  ssh_private_key: ((git_user.private_key))
+  ssh_public_key: ((opsman_ssh.public_key))
+  ssh_private_key: ((opsman_ssh.private_key))
   storage_account_type: Standard_LRS
   subscription_id: ((azure_subscription))
   tenant_id: ((azure_tenant_id))
