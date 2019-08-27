@@ -87,6 +87,12 @@ run:
     create_value "${PREFIX}" "azure_resource_group" "$(tfout pcf_resource_group_name)"
     create_value "${PREFIX}" "azure_subscription" "$(tfout subscription_id)"
     create_value "${PREFIX}" "azure_tenant_id" "$(tfout tenant_id)"
-    create_value "${PREFIX}" "om_external_ip" "$(tfout ops_manager_public_ip)"
-    create_value "${PREFIX}" "om_internal_ip" "$(tfout ops_manager_private_ip)"
-    create_value "${PREFIX}" "opsman_target" "$(tfout ops_manager_dns)"
+
+
+    if [[ $(tfout ops_manager_public_ip) ]]; then 
+      create_value "${PREFIX}" "om_external_ip" "$(tfout ops_manager_public_ip)"
+      create_value "${PREFIX}" "opsman_target" "$(tfout ops_manager_dns)"
+    else 
+      create_value "${PREFIX}" "om_internal_ip" "$(tfout ops_manager_private_ip)"
+      create_value "${PREFIX}" "opsman_target" "$(tfout ops_manager_private_ip)"
+    fi
