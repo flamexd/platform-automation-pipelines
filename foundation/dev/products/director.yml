@@ -3,25 +3,25 @@ networks-configuration:
   networks:
   - name: infrastructure
     subnets:
-    - iaas_identifier: dev-virtual-network/dev-infrastructure-subnet
-      cidr: 10.0.8.0/27
+    - iaas_identifier: AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-PCFINF-SNT-01
+      cidr: 10.126.10.96/27
       dns: 168.63.129.16
       gateway: 10.0.8.1
-      reserved_ip_ranges: 10.0.8.1-10.0.8.9
+      reserved_ip_ranges: 10.126.10.97-10.126.10.105
   - name: pas
     subnets:
-    - iaas_identifier: dev-virtual-network/dev-pas-subnet
-      cidr: 10.0.0.0/22
+    - iaas_identifier: AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-PCFPAS-SNT-01
+      cidr: 10.127.0.0/22
       dns: 168.63.129.16
-      gateway: 10.0.0.1
-      reserved_ip_ranges: 10.0.0.1-10.0.0.9
+      gateway: 10.127.0.1
+      reserved_ip_ranges: 10.127.0.1-10.127.0.9
   - name: services
     subnets:
-    - iaas_identifier: dev-virtual-network/dev-services-subnet
-      cidr: 10.0.4.0/22
+    - iaas_identifier: AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-PCFSVC-SNT-01
+      cidr: 10.127.8.0/22
       dns: 168.63.129.16
-      gateway: 10.0.4.1
-      reserved_ip_ranges: 10.0.4.1-10.0.4.9
+      gateway: 10.127.8.1
+      reserved_ip_ranges: 10.127.8.1-10.127.8.9
 properties-configuration:
   iaas_configuration:
     bosh_storage_account_name: ((iaas.bosh_storage_account_name))
@@ -55,7 +55,7 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: "us.pool.ntp.org, time.google.com"
+    ntp_servers_string: "127.0.0.1"
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false
