@@ -6,7 +6,7 @@ networks-configuration:
     - iaas_identifier: AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-NET-RGP-01/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-PCFINF-SNT-01
       cidr: 10.126.10.96/27
       dns: 168.63.129.16
-      gateway: 10.0.8.1
+      gateway: 10.126.10.97
       reserved_ip_ranges: 10.126.10.97-10.126.10.105
   - name: pas
     subnets:
