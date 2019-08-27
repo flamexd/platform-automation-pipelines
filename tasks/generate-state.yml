@@ -4,6 +4,9 @@ platform: linux
 outputs:
 - name: state
 
+params:
+  ENVIRONMENT: 
+
 run:
   path: bash
   args:
@@ -11,7 +14,7 @@ run:
   - |
     main() {
       set +x
-        echo '{"iaas": "azure", "vm_id": ""}' > state/state.yml
+        echo '{"iaas": "azure", "vm_id": "${ENVIRONMENT}"-ops-manager-vm}' > state/state.yml
       set -x
     }
 

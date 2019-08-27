@@ -107,7 +107,7 @@ resource_types:
     insecure_registries:
     - ((registry_uri))
     repository: ((registry_uri))/library/terraform-resource
-    tag: 0.12.4
+    tag: 0.12.6
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Resources for Terraforming IaaS                                   │
@@ -138,6 +138,7 @@ resources:
       <<: *terraform-backend-params
     vars:
       env_name: ((foundation))
+      resource_group_name: ((azure_resource_group))
       cloud_name: ((azure.cloud_name))
       location: ((azure.region))
       subscription_id: ((azure.subscription_id))
@@ -147,7 +148,10 @@ resources:
       dns_suffix: ((dns_suffix))
       dns_subdomain: ((foundation))
       ops_manager_image_uri: ((ops_manager_image_uri))
+      ops_manager_private_ip: ((ops_manager_private_ip))
+      ops_manager_vm_size: ((ops_manager_vm_size))
       isolation_segment: ((isolation_segment))
+      infrastructure_subnet_id: ((infrastructure_subnet_id))
       pas_subnet_id: ((pas_subnet_id))
       pas_subnet_name: ((pas_subnet_name))
       pas_subnet_gateway: ((pas_subnet_gateway))
@@ -283,6 +287,8 @@ jobs:
   - task: generate-opsman-state
     image: platform-automation-image
     file: platform-automation-pipelines/tasks/generate-state.yml
+    params:
+      ENVIRONMENT: ((foundation))
 
   - put: generated-opsman-state
     params:
