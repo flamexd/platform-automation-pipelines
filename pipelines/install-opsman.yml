@@ -145,23 +145,23 @@ jobs:
   - task: credhub-interpolate
     <<: *credhub-interpolate
 
-  - task: create-vm
-    image: platform-automation-image
-    file: platform-automation-tasks/tasks/create-vm.yml
-    input_mapping:
-      image: opsman-image
-      state: state-file
-      config: platform-automation-pipelines
-      vars: interpolated-files
-    params:
-      OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
-      VARS_FILES: vars/foundation/((foundation))/vars/ops-manager-vars.yml
-      STATE_FILE: state.yml
-    on_success:
-      do:
-        - put: state-file
-          params:
-            file: generated-state/state.yml
+#  - task: create-vm
+#    image: platform-automation-image
+#    file: platform-automation-tasks/tasks/create-vm.yml
+#    input_mapping:
+#      image: opsman-image
+#      state: state-file
+#      config: platform-automation-pipelines
+#      vars: interpolated-files
+#    params:
+#      OPSMAN_CONFIG_FILE: foundation/((foundation))/products/ops-manager.yml
+#      VARS_FILES: vars/foundation/((foundation))/vars/ops-manager-vars.yml
+#      STATE_FILE: state.yml
+#    on_success:
+#      do:
+#        - put: state-file
+#          params:
+#            file: generated-state/state.yml
 
   - task: configure-authentication
     image: platform-automation-image
