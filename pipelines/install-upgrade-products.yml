@@ -104,17 +104,9 @@ resource_types:
   source:
     username: admin
     password: ((registry_password))
-    client_certs:
-    - domain: ((registry_uri))
-      cert: |
-        ((control-plane-ssl-cert))
-      key: |
-        ((control-plane-ssl-key))
-    ca_certs:
-    - domain: ((registry_uri))
-      cert: |
-        ((control-plane-ca-cert))
-    repository: ((registry_uri))/azure/azure-blobstore-resource
+    insecure_registries:
+    - ((registry_uri))
+    repository: ((registry_uri))/library/azure-blobstore-resource
     tag: latest
 
 #┌───────────────────────────────────────────────────────────────────┐
@@ -143,7 +135,6 @@ resources:
   type: git
   source:
     branch: ((git.configuration.branch))
-    private_key: ((git_user.private_key))
     uri: ((git.configuration.uri))
 
 # PLATFORM AUTOMATION
