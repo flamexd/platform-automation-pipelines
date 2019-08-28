@@ -47,6 +47,19 @@ run:
         --value "${value}" >> credhub-import/vars.sh
     }
 
+    function create_ssh() {
+      local prefix="${1}"
+      local credential_name="${2}"
+      local public="${3}"
+      local private="${4}"
+
+      echo credhub set \
+        --name "${prefix}/${credential_name}" \
+        --type ssh \
+        --public "${public}" \
+        --private "${private}" >> credhub-import/vars.sh
+    }
+
     create_users "${PREFIX}" "azure-deploy-storage-account" \
       "$(tfout deploy_backup_storage_account_name)" \
       "$(tfout deploy_backup_storage_account_access_key)"
@@ -65,6 +78,10 @@ run:
     create_users "${PREFIX}" "azure_client" \
       "$(tfout client_id)" \
       "$(tfout client_secret)"
+
+    create_ssh "${PREFIX}" "opsman_ssh" \
+      "$(tfout ops_manager_ssh_public_key)" \
+      "$(tfout ops_manager_ssh_private_key)"
 
     echo OPSMAN_PASSWORD="\$(credhub get \
       --name ${PREFIX}/opsman_admin \
@@ -87,7 +104,6 @@ run:
     create_value "${PREFIX}" "azure_resource_group" "$(tfout pcf_resource_group_name)"
     create_value "${PREFIX}" "azure_subscription" "$(tfout subscription_id)"
     create_value "${PREFIX}" "azure_tenant_id" "$(tfout tenant_id)"
-
 
     if [[ $(tfout ops_manager_public_ip) ]]; then 
       create_value "${PREFIX}" "om_external_ip" "$(tfout ops_manager_public_ip)"
