@@ -356,6 +356,14 @@ jobs:
       vars: interpolated-files
     image: platform-automation-image
 
+  - task: apply-product-changes
+    file: platform-automation-tasks/tasks/apply-changes.yml
+    params:
+      ENV_FILE: foundation/((foundation))/env/env.yml
+    input_mapping:
+      env: interpolated-files
+    image: platform-automation-image
+
 # CREDHUB SERVICE BROKER
 - name: upload-stage-product-csb
   serial: true
@@ -430,6 +438,14 @@ jobs:
       config: platform-automation-pipelines
       env: interpolated-files
       vars: interpolated-files
+    image: platform-automation-image
+
+  - task: apply-product-changes
+    file: platform-automation-tasks/tasks/apply-changes.yml
+    params:
+      ENV_FILE: foundation/((foundation))/env/env.yml
+    input_mapping:
+      env: interpolated-files
     image: platform-automation-image
 
 # MYSQL
@@ -509,6 +525,14 @@ jobs:
       vars: interpolated-files
     image: platform-automation-image
 
+  - task: apply-product-changes
+    file: platform-automation-tasks/tasks/apply-changes.yml
+    params:
+      ENV_FILE: foundation/((foundation))/env/env.yml
+    input_mapping:
+      env: interpolated-files
+    image: platform-automation-image
+
 # Log Analytics Nozzle
 - name: upload-stage-product-lanozzle
   serial: true
@@ -584,6 +608,14 @@ jobs:
       config: platform-automation-pipelines
       env: interpolated-files
       vars: interpolated-files
+    image: platform-automation-image
+  
+  - task: apply-product-changes
+    file: platform-automation-tasks/tasks/apply-changes.yml
+    params:
+      ENV_FILE: foundation/((foundation))/env/env.yml
+    input_mapping:
+      env: interpolated-files
     image: platform-automation-image
 
 # Pivotal Compliance Scanner
@@ -663,25 +695,6 @@ jobs:
       vars: interpolated-files
     image: platform-automation-image
 
-
-# APPLY CHANGES
-- name: apply-product-changes
-  serial: true
-  plan:
-  - aggregate:
-    - get: platform-automation-image
-      params:
-        unpack: true
-    - get: platform-automation-tasks
-      params:
-        unpack: true
-    - get: platform-automation-pipelines
-      passed: [ configure-product-pcs ]
-      trigger: true
-
-  - task: credhub-interpolate
-    <<: *credhub-interpolate
-
   - task: apply-product-changes
     file: platform-automation-tasks/tasks/apply-changes.yml
     params:
@@ -689,6 +702,32 @@ jobs:
     input_mapping:
       env: interpolated-files
     image: platform-automation-image
+
+# APPLY CHANGES
+# - name: apply-product-changes
+#   serial: true
+#   plan:
+#   - aggregate:
+#     - get: platform-automation-image
+#       params:
+#         unpack: true
+#     - get: platform-automation-tasks
+#       params:
+#         unpack: true
+#     - get: platform-automation-pipelines
+#       passed: [ configure-product-pcs ]
+#       trigger: true
+
+  # - task: credhub-interpolate
+  #   <<: *credhub-interpolate
+
+  # - task: apply-product-changes
+  #   file: platform-automation-tasks/tasks/apply-changes.yml
+  #   params:
+  #     ENV_FILE: foundation/((foundation))/env/env.yml
+  #   input_mapping:
+  #     env: interpolated-files
+  #   image: platform-automation-image
 
 # EXPORT INSTALLATION FILE AND STORE IN AZURE BLOBSTORE
 - name: export-installation
