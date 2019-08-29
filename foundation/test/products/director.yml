@@ -55,7 +55,7 @@ properties-configuration:
     keep_unreachable_vms: false
     local_blobstore_options:
       tls_enabled: true
-    ntp_servers_string: "127.0.0.1"
+    ntp_servers_string: "172.19.0.10,172.19.0.11"
     post_deploy_enabled: false
     resurrector_enabled: false
     retry_bosh_deploys: false

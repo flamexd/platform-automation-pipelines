@@ -4,7 +4,7 @@ iaas:
   client_id: ((azure_client.username))
   client_secret: ((azure_client.password))
   cloud_storage_type: standard
-  default_security_group: dev-bosh-deployed-vms-security-group
+  default_security_group: ((foundation))-bosh-deployed-vms-security-group
   environment: AzureUSGovernment
   resource_group_name: ((azure_resource_group))
   ssh_public_key: ((opsman_ssh.public_key))
