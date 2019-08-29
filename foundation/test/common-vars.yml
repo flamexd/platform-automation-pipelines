@@ -7,7 +7,7 @@ ops_manager_image_uri: https://opsmanagereastus.blob.core.windows.net/images/ops
 ops_manager_vm_size: Standard_A4_v2
 ops_manager_private_ip: 10.126.11.125
 infrastructure_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFINF-SNT-01
-pas_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/Z-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFPAS-SNT-01
+pas_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFPAS-SNT-01
 pas_subnet_name: AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFPAS-SNT-01
 pas_subnet_cidr: 22
 pas_subnet_gateway: 10.127.32.1
