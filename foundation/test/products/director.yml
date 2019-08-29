@@ -3,25 +3,25 @@ networks-configuration:
   networks:
   - name: infrastructure
     subnets:
-    - iaas_identifier: ((foundation))-virtual-network/((foundation))-infrastructure-subnet
-      cidr: 10.0.8.0/27
+    - iaas_identifier: AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFINF-SNT-01
+      cidr: 10.126.11.96/27
       dns: 168.63.129.16
-      gateway: 10.0.8.1
-      reserved_ip_ranges: 10.0.8.1-10.0.8.9
+      gateway: 10.126.11.97
+      reserved_ip_ranges: 10.126.11.97-10.126.11.105
   - name: pas
     subnets:
-    - iaas_identifier: ((foundation))-virtual-network/((foundation))-pas-subnet
-      cidr: 10.0.0.0/22
+    - iaas_identifier: AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFPAS-SNT-01
+      cidr: 10.127.32.0/22
       dns: 168.63.129.16
-      gateway: 10.0.0.1
-      reserved_ip_ranges: 10.0.0.1-10.0.0.9
+      gateway: 10.127.32.1
+      reserved_ip_ranges: 10.127.32.1-10.127.32.9
   - name: services
     subnets:
-    - iaas_identifier: ((foundation))-virtual-network/((foundation))-services-subnet
-      cidr: 10.0.4.0/22
+    - iaas_identifier: AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFSVC-SNT-01
+      cidr: 10.127.40.0/22
       dns: 168.63.129.16
-      gateway: 10.0.4.1
-      reserved_ip_ranges: 10.0.4.1-10.0.4.9
+      gateway: 10.127.40.1
+      reserved_ip_ranges: 10.127.40.1-10.127.40.9
 properties-configuration:
   iaas_configuration:
     bosh_storage_account_name: ((iaas.bosh_storage_account_name))
