@@ -1,0 +1,7 @@
+---
+workspace_id: 671f93e2-3a96-43b5-a2d4-bdf3521933ea
+foundation: dev
+properties_firehose_user_password:
+  secret: ((properties_firehose_user_password.secret))
+properties_oms_key:
+  secret: ((properties_oms_key.secret))

@@ -1,0 +1,63 @@
+---
+foundation: test
+dns_suffix: test.logux.net
+terraform_source: terraforming-pas/cce/terraforming-pas
+isolation_segment: false
+ops_manager_image_uri: https://opsmanagereastus.blob.core.windows.net/images/ops-manager-2.6.4-build.166.vhd
+ops_manager_vm_size: Standard_A4_v2
+ops_manager_private_ip: 10.126.10.125
+infrastructure_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/subnets/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-PCFINF-SNT-01
+pas_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-VNT-01/subnets/AZ-DE-DOD-AF-CCE-A4-D-IL5-LOGUX-PCFPAS-SNT-01
+pas_subnet_name: AZ-DE-DOD-AF-CCE-D-IL5-LOGUX-PCFPAS-SNT-01
+pas_subnet_cidr: 22
+pas_subnet_gateway: 10.127.0.1
+weblb_private_ip: 10.127.0.4
+services_subnet_cidr: 22
+services_subnet_gateway: 10.127.8.0
+
+azure:
+  client:
+    username: ((azure_client.username))
+    password: ((azure_client.password))
+  cloud_name: usgovernment
+  region: usdodcentral
+  resource_group: ((azure_resource_group))
+  subscription_id: ((azure_subscription_id))
+  tenant_id: ((azure_tenant_id))
+
+azure_storage_accounts:
+  terraform:  # State files for terraform state (terraform [tfstate])
+    username: ((terraform_azure_blob.username))
+    password: ((terraform_azure_blob.password))
+  state:      # State files for (p-automator [state.yml], opsmgr [installation.zip])
+    username: ((azure-state-storage-account.username))
+    password: ((azure-state-storage-account.password))
+  deploy:     # Products and backups (product [product images], mysql-backup, credhub-backup containers)
+    username: ((azure-deploy-storage-account.username))
+    password: ((azure-deploy-storage-account.password))
+  opsman:     # OpsMan (bosh, stemcell containers)
+    username: ((azure-opsman-storage-account.username))
+    password: ((azure-opsman-storage-account.password))
+  pas:        # PAS (buildpacks, droplets, packages, resources containers)
+    username: ((azure-pas-storage-account.username))
+    password: ((azure-pas-storage-account.password))
+  base_url: core.usgovcloudapi.net
+
+credhub:
+  server: https://credhub.control.test.logux.net:8844  # CredHub endpoint
+  ca_cert: ((credhub_ca_cert))                    # CA Cert from CredHub
+  client: credhub_admin_client                    # UAA Client for CredHub access
+  secret: ((credhub_password))                    # UAA secret for CredHub access
+  interpolate_folders: "foundation/dev/config foundation/dev/env foundation/dev/vars"
+  # The folders from configuration repo (see below git.configuration) to be interpolated
+
+git:
+  configuration:                             # The configuration repo
+    uri: https://log-ux:((git_access_token))@dev.azure.com/log-ux/prometheus/_git/platform-automation-pipelines
+    terraform_uri: https://log-ux:((git_access_token))@dev.azure.com/log-ux/prometheus/_git/bespin-dojo
+    terraform_branch: master
+    branch: master
+  user:                                      # The user for access to configuration repo
+    email: ((pcf_admin_email))               
+    username: ((git_user.username))                        
+    password: ((git_user.password))    

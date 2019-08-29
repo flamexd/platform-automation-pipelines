@@ -1,0 +1,90 @@
+networks-configuration:
+  icmp_checks_enabled: false
+  networks:
+  - name: infrastructure
+    subnets:
+    - iaas_identifier: dev-virtual-network/dev-infrastructure-subnet
+      cidr: 10.0.8.0/27
+      dns: 168.63.129.16
+      gateway: 10.0.8.1
+      reserved_ip_ranges: 10.0.8.1-10.0.8.9
+  - name: pas
+    subnets:
+    - iaas_identifier: dev-virtual-network/dev-pas-subnet
+      cidr: 10.0.0.0/22
+      dns: 168.63.129.16
+      gateway: 10.0.0.1
+      reserved_ip_ranges: 10.0.0.1-10.0.0.9
+  - name: services
+    subnets:
+    - iaas_identifier: dev-virtual-network/dev-services-subnet
+      cidr: 10.0.4.0/22
+      dns: 168.63.129.16
+      gateway: 10.0.4.1
+      reserved_ip_ranges: 10.0.4.1-10.0.4.9
+properties-configuration:
+  iaas_configuration:
+    bosh_storage_account_name: ((iaas.bosh_storage_account_name))
+    client_id: ((iaas.client_id))
+    client_secret: ((iaas.client_secret))
+    storage_account_type: Standard_LRS
+    default_security_group: ((iaas.default_security_group))
+    environment: AzureUSGovernment
+    resource_group_name: ((iaas.resource_group_name))
+    ssh_public_key: ((iaas.ssh_public_key))
+    ssh_private_key: ((iaas.ssh_private_key))
+    subscription_id: ((iaas.subscription_id))
+    tenant_id: ((iaas.tenant_id))
+    cloud_storage_type: managed_disks
+    availability_mode: availability_sets
+  director_configuration:
+    blobstore_type: local
+    bosh_recreate_on_next_deploy: false
+    bosh_recreate_persistent_disks_on_next_deploy: false
+    database_type: internal
+    director_worker_count: 5
+    encryption:
+      keys: []
+      providers: []
+    hm_emailer_options:
+      enabled: false
+    hm_pager_duty_options:
+      enabled: false
+    identification_tags: {}
+    job_configuration_on_tmpfs: false
+    keep_unreachable_vms: false
+    local_blobstore_options:
+      tls_enabled: true
+    ntp_servers_string: "127.0.0.1"
+    post_deploy_enabled: false
+    resurrector_enabled: false
+    retry_bosh_deploys: false
+    skip_director_drain: false
+  dns_configuration:
+    excluded_recursors: []
+    handlers: []
+  security_configuration:
+    opsmanager_root_ca_trusted_certs: true
+    trusted_certificates: ((iaas.trusted_certs))
+  syslog_configuration:
+    enabled: false
+network-assignment:
+  network:
+    name: infrastructure
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
+resource-configuration:
+  compilation:
+    instances: automatic
+    instance_type:
+      id: automatic
+    internet_connected: false
+  director:
+    instances: automatic
+    persistent_disk:
+      size_mb: "307200"
+    instance_type:
+      id: automatic
+    internet_connected: false
