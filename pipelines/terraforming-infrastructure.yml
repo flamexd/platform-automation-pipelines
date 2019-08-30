@@ -110,7 +110,7 @@ resource_types:
     - domain: ((registry_uri))
       cert: ((control-plane-ca-cert))
     repository: ((registry_uri))/azure/terraform-resource
-    tag: 0.12.4
+    tag: 0.12.6
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Resources for Terraforming IaaS                                   │
