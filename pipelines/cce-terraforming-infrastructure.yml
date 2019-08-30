@@ -157,6 +157,7 @@ resources:
       pas_subnet_gateway: ((pas_subnet_gateway))
       pas_subnet_cidr: ((pas_subnet_cidr))
       weblb_private_ip: ((weblb_private_ip))
+      weblb_public_ip_id: ((weblb_public_ip_id))
       services_subnet_cidr: ((services_subnet_cidr))
       services_subnet_gateway: ((services_subnet_gateway))
 
