@@ -11,7 +11,7 @@ pas_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DC-DOD
 pas_subnet_name: AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFPAS-SNT-01
 pas_subnet_cidr: 22
 pas_subnet_gateway: 10.127.32.1
-weblb_private_ip: 10.127.32.3
+weblb_public_ip_id: 52.182.95.246
 services_subnet_cidr: 22
 services_subnet_gateway: 10.127.40.1
 
