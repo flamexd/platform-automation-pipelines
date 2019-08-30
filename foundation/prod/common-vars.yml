@@ -5,7 +5,7 @@ terraform_source: terraforming-pas/cce/terraforming-pas
 isolation_segment: false
 ops_manager_image_uri: https://opsmanagereastus.blob.core.windows.net/images/ops-manager-2.6.4-build.166.vhd
 ops_manager_vm_size: Standard_A4_v2
-ops_manager_private_ip: 10.126.11.133
+ops_manager_private_ip: 10.126.11.125
 infrastructure_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-PCFINF-SNT-01
 pas_subnet_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/virtualNetworks/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-PCFPAS-SNT-01
 pas_subnet_name: AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-PCFPAS-SNT-01
