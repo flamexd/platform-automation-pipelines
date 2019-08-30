@@ -1,0 +1,90 @@
+networks-configuration:
+  icmp_checks_enabled: false
+  networks:
+  - name: infrastructure
+    subnets:
+    - iaas_identifier: AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-VNT-01/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-PCFINF-SNT-01
+      cidr: 10.126.11.96/27
+      dns: 168.63.129.16
+      gateway: 10.126.11.97
+      reserved_ip_ranges: 10.126.11.97-10.126.11.105
+  - name: pas
+    subnets:
+    - iaas_identifier: AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-VNT-01/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-PCFPAS-SNT-01
+      cidr: 10.127.32.0/22
+      dns: 168.63.129.16
+      gateway: 10.127.32.1
+      reserved_ip_ranges: 10.127.32.1-10.127.32.9
+  - name: services
+    subnets:
+    - iaas_identifier: AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-P-IL5-LOGUX-PCFSVC-SNT-01
+      cidr: 10.127.40.0/22
+      dns: 168.63.129.16
+      gateway: 10.127.40.1
+      reserved_ip_ranges: 10.127.40.1-10.127.40.9
+properties-configuration:
+  iaas_configuration:
+    bosh_storage_account_name: ((iaas.bosh_storage_account_name))
+    client_id: ((iaas.client_id))
+    client_secret: ((iaas.client_secret))
+    storage_account_type: Standard_LRS
+    default_security_group: ((iaas.default_security_group))
+    environment: AzureUSGovernment
+    resource_group_name: ((iaas.resource_group_name))
+    ssh_public_key: ((iaas.ssh_public_key))
+    ssh_private_key: ((iaas.ssh_private_key))
+    subscription_id: ((iaas.subscription_id))
+    tenant_id: ((iaas.tenant_id))
+    cloud_storage_type: managed_disks
+    availability_mode: availability_sets
+  director_configuration:
+    blobstore_type: local
+    bosh_recreate_on_next_deploy: false
+    bosh_recreate_persistent_disks_on_next_deploy: false
+    database_type: internal
+    director_worker_count: 5
+    encryption:
+      keys: []
+      providers: []
+    hm_emailer_options:
+      enabled: false
+    hm_pager_duty_options:
+      enabled: false
+    identification_tags: {}
+    job_configuration_on_tmpfs: false
+    keep_unreachable_vms: false
+    local_blobstore_options:
+      tls_enabled: true
+    ntp_servers_string: "172.19.0.10,172.19.0.11"
+    post_deploy_enabled: false
+    resurrector_enabled: false
+    retry_bosh_deploys: false
+    skip_director_drain: false
+  dns_configuration:
+    excluded_recursors: []
+    handlers: []
+  security_configuration:
+    opsmanager_root_ca_trusted_certs: true
+    trusted_certificates: ((iaas.trusted_certs))
+  syslog_configuration:
+    enabled: false
+network-assignment:
+  network:
+    name: infrastructure
+  other_availability_zones:
+  - name: Availability Sets
+  singleton_availability_zone:
+    name: Availability Sets
+resource-configuration:
+  compilation:
+    instances: automatic
+    instance_type:
+      id: automatic
+    internet_connected: false
+  director:
+    instances: automatic
+    persistent_disk:
+      size_mb: "307200"
+    instance_type:
+      id: automatic
+    internet_connected: false

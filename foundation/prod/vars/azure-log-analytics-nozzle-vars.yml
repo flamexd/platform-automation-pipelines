@@ -1,0 +1,7 @@
+---
+workspace_id: ((log_analytics_workspace))
+foundation: ((foundation))
+properties_firehose_user_password:
+  secret: ((properties_firehose_user_password.secret))
+properties_oms_key:
+  secret: ((properties_oms_key.secret))
