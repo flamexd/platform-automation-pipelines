@@ -13,3 +13,4 @@ iaas:
   subscription_id: ((azure_subscription))
   tenant_id: ((azure_tenant_id))
   trusted_certs: ((wildcard_cert.ca))
+  network_resource_group_name: ((azure_network_resource_group))
