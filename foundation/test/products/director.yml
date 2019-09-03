@@ -17,7 +17,7 @@ networks-configuration:
       reserved_ip_ranges: 10.127.32.1-10.127.32.9
   - name: services
     subnets:
-    - iaas_identifier: ((iaas.network_resource_group_name))/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/subnets/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFSVC-SNT-01
+    - iaas_identifier: ((iaas.network_resource_group_name))/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-VNT-01/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFSVC-SNT-01
       cidr: 10.127.40.0/22
       dns: 168.63.129.16
       gateway: 10.127.40.1
