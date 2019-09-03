@@ -100,11 +100,11 @@ resources:
     <<: *state-storage-params
 
 # OPSMAN IMAGE
-- name: opsman-image
-  type: azure-blobstore
-  source:
-    regexp: ((products.opsman.product-regex))
-    <<: *deploy-storage-params
+# - name: opsman-image
+#   type: azure-blobstore
+#   source:
+#     regexp: ((products.opsman.product-regex))
+#     <<: *deploy-storage-params
 
 #┌───────────────────────────────────────────────────────────────────┐
 #├ Jobs for Operations Manager Install Workflow                      │
@@ -133,8 +133,8 @@ jobs:
   serial: true
   plan:
   - aggregate:
-    - get: opsman-image
-      trigger: true
+#     - get: opsman-image
+#       trigger: true
     - get: platform-automation-image
       params: { unpack: true }
     - get: platform-automation-tasks
