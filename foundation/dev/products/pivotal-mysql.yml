@@ -42,7 +42,7 @@ product-properties:
   .properties.enable_secure_binding_credentials:
     value: ((enable_secure_binding_credentials))
   .properties.enable_tls_selector:
-    value: disabled
+    value: required
   .properties.global_recipient_email:
     value: ((global_recipient_email))
   .properties.global_service_instance_limit:
