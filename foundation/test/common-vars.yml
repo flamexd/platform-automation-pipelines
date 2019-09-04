@@ -12,7 +12,7 @@ pas_subnet_name: AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PCFPAS-SNT-01
 pas_subnet_cidr: 22
 pas_subnet_gateway: 10.127.32.1
 weblb_private_ip: "" 
-weblb_public_ip_id: /subscriptions/f70e092b-64f7-4a19-91eb-7a73034c5197/resourceGroups/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/publicIPAddresses/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PIP-01
+weblb_public_ip_id: /subscriptions/((azure_subscription_id))/resourceGroups/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-NET-RGP-01/providers/Microsoft.Network/publicIPAddresses/AZ-DC-DOD-AF-CCE-A4-T-IL5-LOGUX-PIP-01
 services_subnet_cidr: 22
 services_subnet_gateway: 10.127.40.1
 
